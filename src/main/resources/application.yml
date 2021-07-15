@@ -16,10 +16,17 @@ spring:
         max-idle: 8
         min-idle: 0
     timeout: 1000
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:sanye}?serverTimezone=GMT%2B8
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${DB_USER:root}
+    password: ${DB_PWD:root}
 captcha: #自定义的验证码配置
   width: 133
   height: 40
   expire: 60
+swagger: #自定义是否开启swagger2文档
+  enable:true
 logging: #springboot自带的logback配置
   file:
     path: /app/log

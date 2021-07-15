@@ -1,9 +1,10 @@
+#服务端配置
 server:
-  port: 8888
+  port: 8888 #端口
   servlet:
-    context-path: /sanye   #ͳһ���ʵ�ǰ׺
+    context-path: /sanye   #统一请求前缀
 spring:
-  redis:
+  redis:    #redis链接配置
     host: ${REDIS_HOST:127.0.0.1}
     port: ${REDIS_PORT:6379}
     database: 0
@@ -15,6 +16,12 @@ spring:
         max-idle: 8
         min-idle: 0
     timeout: 1000
-captcha:
+captcha: #自定义的验证码配置
   width: 133
   height: 40
+  expire: 60
+logging: #springboot自带的logback配置
+  file:
+    path: /app/log
+  level:
+    root: info

@@ -28,13 +28,15 @@ public class CaptchaController {
     private int width;
     @Value("${captcha.height}")
     private int height;
+    @Value("${captcha.expire}")
+    private int expire;
     @GetMapping("/captcha")
     public Result get(){
         ArithmeticCaptcha captcha = new ArithmeticCaptcha(width, height);
         captcha.setLen(2);
         String resultValue = captcha.text();
         String key = UUID.randomUUID().toString();
-        redisUtil.set(key,resultValue,30);
+        redisUtil.set(key,resultValue,expire);
         HashMap<String, Object> jsonResult = new HashMap<>();
         jsonResult.put("codeKey",key);
         jsonResult.put("code2Base64",captcha.toBase64());

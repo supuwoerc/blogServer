@@ -1,6 +1,12 @@
 package cn.lookup.sanye.common.vo;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
+
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 /**
  * @Author: zhangqm<sanye>
@@ -31,5 +37,14 @@ public class Result {
         result.setMessage(msg);
         result.setData(data);
         return result;
+    }
+    public static void write(int code, String message, Object data, HttpServletResponse httpServletResponse) throws IOException {
+        httpServletResponse.setCharacterEncoding("UTF-8");
+        httpServletResponse.setContentType("application/json;charset=utf-8");
+        Result result = Result.fail(code, message, data);
+        PrintWriter writer = httpServletResponse.getWriter();
+        writer.write(new ObjectMapper().writeValueAsString(result));
+        writer.flush();
+        writer.close();
     }
 }

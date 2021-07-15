@@ -1,10 +1,10 @@
 #服务端配置
 server:
-  port: 8888 #端口
+  port: 8888
   servlet:
     context-path: /sanye   #统一请求前缀
 spring:
-  redis:    #redis链接配置
+  redis:
     host: ${REDIS_HOST:127.0.0.1}
     port: ${REDIS_PORT:6379}
     database: 0
@@ -26,17 +26,32 @@ spring:
       minimum-idle: 0
       idle-timeout: 180000
       connection-test-query: select 1
-captcha: #自定义的验证码配置
+#自定义的验证码配置
+captcha:
   width: 133
   height: 40
   expire: 60*3
   size: 3
-swagger: #自定义是否开启swagger2文档
+#自定义是否开启swagger2文档
+swagger:
   enable:true
-logging: #springboot自带的logback配置
+#springboot自带的logback配置
+logging:
   file:
     path: /app/log
   level:
     root: info
 mybatis-plus:
   mapper-locations: classpath:mapper/*.xml
+# JWT配置
+jwt:
+  # 密匙Key
+  secret: sanyeSecurity
+  # HeaderKey
+  tokenHeader: Authorization
+  # Token前缀
+  tokenPrefix: Bearer
+  # 过期时间，单位秒
+  expiration: 90
+  # 配置白名单（不需要认证）
+  antMatchers: /login/**,/register/**,/static/**,/

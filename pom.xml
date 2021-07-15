@@ -68,6 +68,13 @@
             <version>3.0.5</version>
         </dependency>
         <!-- mybatis-plus -->
+        <!--freemarker-->
+        <dependency>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
+            <version>2.3.30</version>
+        </dependency>
+        <!--freemarker-->
         <!-- swagger2 依赖 -->
         <dependency>
             <groupId>io.springfox</groupId>
@@ -81,8 +88,25 @@
             <version>1.9.6</version>
         </dependency>
         <!-- Swagger第三方ui依赖 -->
+        <!--Spring Security依赖 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <!--Spring Security依赖 -->
+        <!-- JWT依赖 -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-jwt</artifactId>
+            <version>1.1.1.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>0.9.1</version>
+        </dependency>
+        <!-- JWT依赖 -->
     </dependencies>
-
     <build>
         <plugins>
             <plugin>
@@ -99,5 +123,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

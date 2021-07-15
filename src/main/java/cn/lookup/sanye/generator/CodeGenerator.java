@@ -41,7 +41,7 @@ public class CodeGenerator {
         // 全局配置
         GlobalConfig gc = new GlobalConfig();
         String projectPath = System.getProperty("user.dir");
-        gc.setOutputDir(projectPath + "/blogServer/src/main/java");
+        gc.setOutputDir(projectPath + "/src/main/java");
         //作者
         gc.setAuthor("zhangqm<sanye>");
         //打开输出目录
@@ -92,7 +92,7 @@ public class CodeGenerator {
             @Override
             public String outputFile(TableInfo tableInfo) {
                 // 自定义输出文件名 ， 如果你 Entity 设置了前后缀、此处注意 xml 的名称会跟着发生变化！！
-                return projectPath + "/blogServer/src/main/resources/mapper/" + tableInfo.getEntityName() + "Mapper"
+                return projectPath + "/src/main/resources/mapper/" + tableInfo.getEntityName() + "Mapper"
                         + StringPool.DOT_XML;
             }
         });
@@ -117,7 +117,7 @@ public class CodeGenerator {
         strategy.setInclude(scanner("表名，多个英文逗号分割").split(","));
         strategy.setControllerMappingHyphenStyle(true);
         //表前缀
-        strategy.setTablePrefix("t_");
+        strategy.setTablePrefix("sys_");
         mpg.setStrategy(strategy);
         mpg.setTemplateEngine(new FreemarkerTemplateEngine());
         mpg.execute();

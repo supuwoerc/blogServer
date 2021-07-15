@@ -24,20 +24,20 @@ public class Swagger2Config {
     /**
      * 定义扫描那些包下面的文件生成api文档
      */
-    @Bean
-    public Docket createRestApi() {
-        return new Docket(DocumentationType.SWAGGER_2)
-                .enable(swaggerEnable)
-                .apiInfo(apiInfo())
-                .select()
-                .apis(RequestHandlerSelectors.basePackage("cn.lookup.sanye.controller"))
-                .paths(PathSelectors.any())
-                .build()
-                //设置需要认证的路径
-                .securityContexts(securityContexts())
-                //自定义请求头的参数
-                .securitySchemes(securitySchemes());
-    }
+//    @Bean
+//    public Docket createRestApi() {
+//        return new Docket(DocumentationType.SWAGGER_2)
+//                .enable(swaggerEnable)
+//                .apiInfo(apiInfo())
+//                .select()
+//                .apis(RequestHandlerSelectors.basePackage("cn.lookup.sanye.controller"))
+//                .paths(PathSelectors.any())
+//                .build()
+//                //设置需要认证的路径
+//                .securityContexts(securityContexts())
+//                //自定义请求头的参数
+//                .securitySchemes(securitySchemes());
+//    }
     /**
      * 定义展示的信息，例如标题、描述、版本等
      */

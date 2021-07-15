@@ -30,10 +30,12 @@ public class CaptchaController {
     private int height;
     @Value("${captcha.expire}")
     private int expire;
+    @Value("${captcha.size}")
+    private int size;
     @GetMapping("/captcha")
     public Result get(){
         ArithmeticCaptcha captcha = new ArithmeticCaptcha(width, height);
-        captcha.setLen(2);
+        captcha.setLen(size);
         String resultValue = captcha.text();
         String key = UUID.randomUUID().toString();
         redisUtil.set(key,resultValue,expire);

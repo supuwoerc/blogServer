@@ -27,6 +27,7 @@ public class Swagger2Config {
     @Bean
     public Docket createRestApi() {
         return new Docket(DocumentationType.SWAGGER_2)
+                .enable(swaggerEnable)
                 .apiInfo(apiInfo())
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("cn.lookup.sanye.controller"))
@@ -45,6 +46,4 @@ public class Swagger2Config {
                 .termsOfServiceUrl("http://127.0.0.1:8080/").version("1.0")
                 .build();
     }
-
-
 }

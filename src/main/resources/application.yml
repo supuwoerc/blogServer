@@ -21,10 +21,16 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: ${DB_USER:root}
     password: ${DB_PWD:root}
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 0
+      idle-timeout: 180000
+      connection-test-query: select 1
 captcha: #自定义的验证码配置
   width: 133
   height: 40
-  expire: 60
+  expire: 60*3
+  size: 3
 swagger: #自定义是否开启swagger2文档
   enable:true
 logging: #springboot自带的logback配置
@@ -32,3 +38,5 @@ logging: #springboot自带的logback配置
     path: /app/log
   level:
     root: info
+mybatis-plus:
+  mapper-locations: classpath:mapper/*.xml

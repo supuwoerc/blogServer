@@ -22,6 +22,7 @@ public class UserAccessDeniedHandler implements AccessDeniedHandler {
     @Override
     public void handle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AccessDeniedException e) throws IOException, ServletException {
         httpServletResponse.setCharacterEncoding("UTF-8");
+        httpServletResponse.setStatus(403);
         httpServletResponse.setContentType("application/json;charset=utf-8");
         Result result = Result.fail(403, "权限不足", null);
         PrintWriter writer = httpServletResponse.getWriter();

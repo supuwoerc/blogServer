@@ -13,7 +13,6 @@ import java.util.List;
  * @Date: 2021/7/15 23:24
  * @Desc: 系统用户dao
  */
-@Repository
 public interface SysUserMapper extends BaseMapper<User> {
     /**
      * 根据用户ID查询角色

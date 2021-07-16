@@ -10,10 +10,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 class SanyeApplicationTests {
-    @Autowired
-    private UserMapper userMapper;
     @Test
     void contextLoads() {
-
+        System.out.println("springboot");
     }
 }

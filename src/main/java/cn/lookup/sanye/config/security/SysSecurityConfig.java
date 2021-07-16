@@ -1,6 +1,7 @@
 package cn.lookup.sanye.config.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -24,7 +25,8 @@ import org.springframework.security.web.access.expression.DefaultWebSecurityExpr
 public class SysSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private UserAccessDeniedHandler userAccessDeniedHandler;   //403权限不足处理类
-    @Autowired
+    @Autowired()
+    @Qualifier("UserNotLoginHandler")
     private UserNotLoginHandler userNotLoginHandler;            //401未登录处理类
     @Autowired
     private UserLoginSuccessHandler userLoginSuccessHandler;   //登陆成功处理类
@@ -69,13 +71,14 @@ public class SysSecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests() // 权限配置
                 .antMatchers(JWTConfig.antMatchers.split(",")).permitAll()// 获取白名单（不进行权限验证）
                 .anyRequest().authenticated() // 其他的需要登陆后才能访问
-                .and().httpBasic().authenticationEntryPoint(userNotLoginHandler) // 配置未登录处理类
+                .and().httpBasic()
                 .and().formLogin().loginProcessingUrl("/login/submit")// 配置登录URL
                 .successHandler(userLoginSuccessHandler) // 配置登录成功处理类
                 .failureHandler(userLoginFailureHandler) // 配置登录失败处理类
                 .and().logout().logoutUrl("/logout/submit")// 配置登出地址
                 .logoutSuccessHandler(userLogoutSuccessHandler) // 配置用户登出处理类
                 .and().exceptionHandling().accessDeniedHandler(userAccessDeniedHandler)// 配置没有权限处理类
+                .authenticationEntryPoint(userNotLoginHandler) // 配置未登录处理类
                 .and().cors()// 开启跨域
                 .and().csrf().disable(); // 禁用跨站请求伪造防护
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS); // 禁用session（使用Token认证）

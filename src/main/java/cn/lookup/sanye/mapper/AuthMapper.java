@@ -12,7 +12,6 @@ import org.springframework.stereotype.Repository;
  * @author zhangqm<sanye>
  * @since 2021-07-15
  */
-@Repository
 public interface AuthMapper extends BaseMapper<Auth> {
 
 }

@@ -31,7 +31,7 @@ captcha:
   width: 133
   height: 40
   expire: 300
-  size: 3
+  size: 2
 #自定义是否开启swagger2文档
 swagger:
   enable:true

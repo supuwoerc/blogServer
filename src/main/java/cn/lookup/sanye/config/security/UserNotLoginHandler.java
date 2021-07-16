@@ -17,12 +17,13 @@ import java.io.PrintWriter;
  * @Date: 2021/7/15 22:46
  * @Desc: 401未登录的情况
  */
-@Component
+@Component("UserNotLoginHandler")
 public class UserNotLoginHandler implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AuthenticationException e) throws IOException, ServletException {
         httpServletResponse.setCharacterEncoding("UTF-8");
         httpServletResponse.setContentType("application/json;charset=utf-8");
+        httpServletResponse.setStatus(401);   //修改请求状态，不然就302重定向到登录页了
         Result result = Result.fail(401, "未登录", null);
         PrintWriter writer = httpServletResponse.getWriter();
         writer.write(new ObjectMapper().writeValueAsString(result));

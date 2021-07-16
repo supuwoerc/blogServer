@@ -6,11 +6,13 @@ import cn.lookup.sanye.pojo.User;
 import cn.lookup.sanye.service.SysUserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.util.HashSet;
@@ -21,6 +23,7 @@ import java.util.List;
  * @Date: 2021/7/15 23:53
  * @Desc: 用户登录service
  */
+@Service
 public class SysUserDetailsService implements UserDetailsService {
     @Autowired
     private SysUserService sysUserService;
@@ -43,7 +46,8 @@ public class SysUserDetailsService implements UserDetailsService {
             });
             sysUserDetails.setAuthorities(authorities);
             return sysUserDetails;
+        }else{
+            throw new UsernameNotFoundException("账户不存在");
         }
-        return null;
     }
 }

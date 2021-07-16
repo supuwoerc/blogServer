@@ -4,6 +4,7 @@ import cn.lookup.sanye.pojo.Auth;
 import cn.lookup.sanye.pojo.Role;
 import cn.lookup.sanye.pojo.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -12,6 +13,7 @@ import java.util.List;
  * @Date: 2021/7/15 23:24
  * @Desc: 系统用户dao
  */
+@Repository
 public interface SysUserMapper extends BaseMapper<User> {
     /**
      * 根据用户ID查询角色

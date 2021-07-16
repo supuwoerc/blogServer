@@ -1,4 +1,4 @@
-package cn.lookup.sanye.config;
+package cn.lookup.sanye.config.security;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;

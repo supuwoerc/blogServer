@@ -16,11 +16,11 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
  * @Date: 2021/7/15 14:41
  * @Desc:Swagger2的配置类
  **/
-@Configuration
-@EnableSwagger2
+//@Configuration
+//@EnableSwagger2
 public class Swagger2Config {
-    @Value("${swagger.enable}")
-    private boolean swaggerEnable;   //是否开启文档(区分开发环境和生产环境来开启关闭接口文档)
+   // @Value("${swagger.enable}")
+    //private boolean swaggerEnable;   //是否开启文档(区分开发环境和生产环境来开启关闭接口文档)
     /**
      * 定义扫描那些包下面的文件生成api文档
      */
@@ -41,9 +41,9 @@ public class Swagger2Config {
     /**
      * 定义展示的信息，例如标题、描述、版本等
      */
-    private ApiInfo apiInfo() {
-        return new ApiInfoBuilder().title("sanye").description("接口文档")
-                .termsOfServiceUrl("http://127.0.0.1:8080/").version("1.0")
-                .build();
-    }
+//    private ApiInfo apiInfo() {
+//        return new ApiInfoBuilder().title("sanye").description("接口文档")
+//                .termsOfServiceUrl("http://127.0.0.1:8888/").version("1.0")
+//                .build();
+//    }
 }

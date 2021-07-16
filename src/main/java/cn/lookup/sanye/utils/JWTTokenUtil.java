@@ -1,20 +1,18 @@
 package cn.lookup.sanye.utils;
 
-import cn.lookup.sanye.config.JWTConfig;
+import cn.lookup.sanye.config.security.JWTConfig;
 import cn.lookup.sanye.pojo.SysUserDetails;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.util.StringUtils;
 
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 
 /**
  * @Author: zhangqm<sanye>

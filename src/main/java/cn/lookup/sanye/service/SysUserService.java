@@ -1,5 +1,6 @@
 package cn.lookup.sanye.service;
 
+import cn.lookup.sanye.common.vo.Result;
 import cn.lookup.sanye.pojo.Auth;
 import cn.lookup.sanye.pojo.Role;
 import cn.lookup.sanye.pojo.User;
@@ -32,4 +33,14 @@ public interface SysUserService extends IService<User> {
      * @return
      */
     List<Auth> findAuthsByUserId(Long userId);
+
+    /**
+     * 用户注册接口
+     * @param username
+     * @param password
+     * @param codeKey 验证码key
+     * @param code  验证码
+     * @return
+     */
+    Result register(String username, String password, String codeKey, String code);
 }

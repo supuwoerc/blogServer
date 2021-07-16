@@ -1,4 +1,4 @@
-package cn.lookup.sanye.config;
+package cn.lookup.sanye.config.security;
 
 import cn.lookup.sanye.common.vo.Result;
 import org.springframework.security.core.AuthenticationException;

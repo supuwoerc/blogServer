@@ -4,6 +4,7 @@ import cn.lookup.sanye.pojo.Role;
 import cn.lookup.sanye.pojo.SysUserDetails;
 import cn.lookup.sanye.pojo.User;
 import cn.lookup.sanye.service.SysUserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,6 +25,7 @@ import java.util.List;
  * @Desc: 用户登录service
  */
 @Service
+@Slf4j
 public class SysUserDetailsService implements UserDetailsService {
     @Autowired
     private SysUserService sysUserService;
@@ -47,6 +49,7 @@ public class SysUserDetailsService implements UserDetailsService {
             sysUserDetails.setAuthorities(authorities);
             return sysUserDetails;
         }else{
+            log.info("账户不存在");
             throw new UsernameNotFoundException("账户不存在");
         }
     }

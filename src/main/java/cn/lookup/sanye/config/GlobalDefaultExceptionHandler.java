@@ -37,7 +37,6 @@ public class GlobalDefaultExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseBody
     public Result exceptionHandler(HttpServletRequest request,Exception e){
-        System.out.println(e.getMessage());
         return Result.fail(500,e.getMessage(),null);
     }
 }

@@ -27,6 +27,7 @@ public class UserAuthenticationProvider implements AuthenticationProvider {
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Override
+    //https://www.jianshu.com/p/693914564406   TODO:这里可以扩展接收json格式的数据，而非form-data
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String username = (String) authentication.getPrincipal();  //用户名
         String password = (String) authentication.getCredentials();  //密码(明文)

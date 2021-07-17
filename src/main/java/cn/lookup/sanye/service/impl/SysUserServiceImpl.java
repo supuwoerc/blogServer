@@ -86,7 +86,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, User> impleme
                 User user = new User();
                 user.setPassword(passwordEncoder.encode(password));
                 user.setUsername(username);
-                user.setStatus(1);
+                user.setStatus(0);
                 userService.save(user);
                 //设置用户角色
                 UserRole userRole = new UserRole();

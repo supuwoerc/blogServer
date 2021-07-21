@@ -29,8 +29,10 @@ import java.util.List;
 public class SysUserDetailsService implements UserDetailsService {
     @Autowired
     private SysUserService sysUserService;
+
     /**
      * 根据用户名查用户信息
+     *
      * @param username 用户名
      * @return 用户详细信息
      */
@@ -40,7 +42,7 @@ public class SysUserDetailsService implements UserDetailsService {
         if (sysUser != null) {
             //设置用户
             SysUserDetails sysUserDetails = new SysUserDetails();
-            BeanUtils.copyProperties(sysUser,sysUserDetails);
+            BeanUtils.copyProperties(sysUser, sysUserDetails);
             HashSet<GrantedAuthority> authorities = new HashSet<>();
             List<Role> roleList = sysUserService.findRolesByUserId(sysUser.getId());
             roleList.forEach(role -> {
@@ -48,7 +50,7 @@ public class SysUserDetailsService implements UserDetailsService {
             });
             sysUserDetails.setAuthorities(authorities);
             return sysUserDetails;
-        }else{
+        } else {
             log.info("账户不存在");
             throw new UsernameNotFoundException("账户不存在");
         }

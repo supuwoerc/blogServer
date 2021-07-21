@@ -1,5 +1,6 @@
 package cn.lookup.sanye.pojo;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -33,6 +34,7 @@ public class Role implements Serializable {
     /**
      * 角色名称
      */
+    @TableField("role_name")
     private String role_name;
 
 

@@ -7,10 +7,10 @@ import javax.validation.constraints.NotBlank;
 /**
  * @Author: zhangqm<sanye>
  * @Date: 2021/7/16 15:10
- * @Desc:desc
+ * @Desc:登录、注册接口的dto
  **/
 @Data
-public class SysUserDto {
+public class LoginAndRegisterUserDto {
     /**
      * 账户名
      */

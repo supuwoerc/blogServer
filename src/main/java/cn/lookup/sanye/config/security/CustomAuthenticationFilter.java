@@ -1,7 +1,8 @@
 package cn.lookup.sanye.config.security;
 
-import cn.lookup.sanye.common.dto.SysUserDto;
+import cn.lookup.sanye.common.dto.LoginAndRegisterUserDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -16,9 +17,11 @@ import java.io.InputStream;
 /**
  * @Author: zhangqm<sanye>
  * @Date: 2021/7/17 15:47
- * @Desc: 重写UsernamePasswordAuthenticationFilter来获取提交的参数(spring - security默认是form - data, 修改为先
+ * @Desc: 重写UsernamePasswordAuthenticationFilter来获取提交的参数(springSecurity默认是formData, 修改为先
  *判断参数是否为json,是的话解析json,不是json的话依旧用父类里面的方法)
  */
+@SuppressWarnings("all")
+@Slf4j
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     /**
      * obtainUsername和obtainPassword方法的注释已经说了,可以让子类来自定义用户名和密码的获取工作,
@@ -32,13 +35,14 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         //Content-Type为json的情况下
         if (request.getContentType().equals(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 || request.getContentType().equals(MediaType.APPLICATION_JSON_VALUE)) {
+            log.info("登录数据类型为json...");
             //用jackson处理参数
             ObjectMapper mapper = new ObjectMapper();
             UsernamePasswordAuthenticationToken authRequest = null;
             try (InputStream is = request.getInputStream()) {
-                SysUserDto sysUserDto = mapper.readValue(is, SysUserDto.class);
+                LoginAndRegisterUserDto loginAndRegisterUserDto = mapper.readValue(is, LoginAndRegisterUserDto.class);
                 authRequest = new UsernamePasswordAuthenticationToken(
-                        sysUserDto.getUsername(), sysUserDto.getPassword());
+                        loginAndRegisterUserDto.getUsername(), loginAndRegisterUserDto.getPassword());
             } catch (IOException e) {
                 e.printStackTrace();
                 authRequest = new UsernamePasswordAuthenticationToken(
@@ -48,6 +52,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
                 return this.getAuthenticationManager().authenticate(authRequest);
             }
         } else {
+            log.info("登录数据类型为formData...");
             return super.attemptAuthentication(request, response);
         }
     }

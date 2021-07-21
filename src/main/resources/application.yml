@@ -45,6 +45,7 @@ mybatis-plus:
   mapper-locations: classpath:mapper/*.xml
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: false #https://zhuanlan.zhihu.com/p/344988816 mybatis-plus默认将下划线转驼峰，导致实体封装会有问题，关闭就行，否则每次都要指定resultMap
 # JWT配置
 jwt:
   # 密匙Key
@@ -54,6 +55,6 @@ jwt:
   # Token前缀
   tokenPrefix: Bearer
   # 过期时间，单位秒
-  expiration: 120
+  expiration: 604800
   # 配置白名单（不需要认证）
   antMatchers: /,/login/**,/register/**,/static/**,/index.html,/swagger-resources/**,/webjars/**,/v2/api-docs,/captcha

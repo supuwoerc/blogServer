@@ -23,7 +23,7 @@ class SanyeApplicationTests {
     }
     @Test
     void sysUserDetailsTest(){
-        List<Role> rolesByUserId = sysUserService.findRolesByUserId(2l);
+        List<Role> rolesByUserId = sysUserService.findRolesByUserId(3l);
         System.out.println(rolesByUserId);
     }
 }

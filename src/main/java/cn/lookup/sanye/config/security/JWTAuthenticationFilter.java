@@ -25,7 +25,8 @@ import java.util.Collection;
 public class JWTAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
-        String token = request.getHeader(JWTConfig.tokenHeader);
+        System.out.println("jwt校验");
+       String token = request.getHeader(JWTConfig.tokenHeader);
         if(token!=null&&token.startsWith(JWTConfig.tokenPrefix)){
             SysUserDetails sysUserDetails = JWTTokenUtil.parseAccessToken(token);
             if(sysUserDetails!=null){

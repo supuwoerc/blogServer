@@ -3,6 +3,7 @@ server:
   port: 8888
   servlet:
     context-path: /sanye   #统一请求前缀
+
 spring:
   redis:
     host: ${REDIS_HOST:127.0.0.1}

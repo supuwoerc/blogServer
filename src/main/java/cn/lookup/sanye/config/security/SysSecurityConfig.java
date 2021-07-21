@@ -8,6 +8,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -41,6 +42,8 @@ public class SysSecurityConfig extends WebSecurityConfigurerAdapter {
     private UserAuthenticationProvider userAuthenticationProvider; //登录验证处理
     @Autowired
     private UserPermissionEvaluator userPermissionEvaluator;  //用户权限注解
+    @Autowired
+    private ValidateCodeFilter validateCodeFilter;
     /**
      * 密码编码
      * @return
@@ -64,17 +67,21 @@ public class SysSecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Override
     protected void configure(AuthenticationManagerBuilder auth) {
-        auth.authenticationProvider(71);
+        auth.authenticationProvider(userAuthenticationProvider);
     }
     /**
      * 安全权限配置
      */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        // 添加JWT过滤器
+        http.addFilterBefore(new JWTAuthenticationFilter(),UsernamePasswordAuthenticationFilter.class);
+        //添加登录校验验证码验证码的过滤器
+        http.addFilterBefore(validateCodeFilter,JWTAuthenticationFilter.class);
         //用重写的Filter替换掉原有的UsernamePasswordAuthenticationFilter
         //http://www.zzvips.com/article/176541.html
         //https://www.jianshu.com/p/693914564406
-        //http.addFilterAt(customAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterAt(customAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         // 权限配置
         http.authorizeRequests()
                 .antMatchers(JWTConfig.antMatchers.split(",")).permitAll()// 获取白名单（不进行权限验证）
@@ -88,7 +95,6 @@ public class SysSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and().csrf().disable(); // 禁用跨站请求伪造防护
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS); // 禁用session（使用Token认证）
         http.headers().cacheControl(); // 禁用缓存
-        //http.addFilterBefore(new JWTAuthenticationFilter(),UsernamePasswordAuthenticationFilter.class); // 添加JWT过滤器
     }
     /*注册自定义的UsernamePasswordAuthenticationFilter来登录(springSecurity默认接受formData的数据,
     CustomAuthenticationFilter扩展为支持json的方式，添加重写的过滤器需要指定登陆成功和登录失败的处理器)*/
@@ -107,4 +113,5 @@ public class SysSecurityConfig extends WebSecurityConfigurerAdapter {
     protected AuthenticationManager authenticationManager() throws Exception {
         return super.authenticationManager();
     }
+
 }

@@ -7,11 +7,7 @@ import cn.lookup.sanye.pojo.User;
 import cn.lookup.sanye.service.SysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.*;
 /**
  * <p>
  *  前端控制器
@@ -31,5 +27,10 @@ public class UserController {
         SysUserDetails sysUserDetails = (SysUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user = sysUserService.getById(sysUserDetails.getId());
         return Result.success(user);
+    }
+    @PostMapping("/test")
+    public Result test(@RequestParam("name") String name){
+        System.out.println(name);
+        return Result.success("test");
     }
 }

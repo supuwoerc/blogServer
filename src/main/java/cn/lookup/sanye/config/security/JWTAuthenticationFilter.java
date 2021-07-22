@@ -2,12 +2,9 @@ package cn.lookup.sanye.config.security;
 
 import cn.lookup.sanye.pojo.SysUserDetails;
 import cn.lookup.sanye.utils.JWTTokenUtil;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.AuthenticationEntryPoint;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -25,17 +22,16 @@ import java.util.Collection;
 public class JWTAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
-        System.out.println("jwt校验");
-       String token = request.getHeader(JWTConfig.tokenHeader);
-        if(token!=null&&token.startsWith(JWTConfig.tokenPrefix)){
+        String token = request.getHeader(JWTConfig.tokenHeader);
+        if (token != null && token.startsWith(JWTConfig.tokenPrefix)) {
             SysUserDetails sysUserDetails = JWTTokenUtil.parseAccessToken(token);
-            if(sysUserDetails!=null){
+            if (sysUserDetails != null) {
                 //设置上下文对象
                 Collection<? extends GrantedAuthority> authorities = sysUserDetails.getAuthorities();
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(sysUserDetails, sysUserDetails.getPassword(),authorities);
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(sysUserDetails, sysUserDetails.getPassword(), authorities);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
-        chain.doFilter(request,response);
+        chain.doFilter(request, response);
     }
 }

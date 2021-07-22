@@ -1,5 +1,6 @@
 package cn.lookup.sanye.config.security;
 
+import cn.lookup.sanye.config.filter.BodyReaderFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -42,8 +43,6 @@ public class SysSecurityConfig extends WebSecurityConfigurerAdapter {
     private UserAuthenticationProvider userAuthenticationProvider; //登录验证处理
     @Autowired
     private UserPermissionEvaluator userPermissionEvaluator;  //用户权限注解
-    @Autowired
-    private ValidateCodeFilter validateCodeFilter;
     /**
      * 密码编码
      * @return
@@ -76,10 +75,12 @@ public class SysSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         // 添加JWT过滤器
         http.addFilterBefore(new JWTAuthenticationFilter(),UsernamePasswordAuthenticationFilter.class);
-        //添加登录校验验证码验证码的过滤器
-        http.addFilterBefore(validateCodeFilter,JWTAuthenticationFilter.class);
+        //添加登录校验验证码验证码的过滤器(在读取json时用了将request转inputStream的方式，会导致下一个过滤器(CustomAuthenticationFilter)没法读取参数)
+        //https://www.jianshu.com/p/ec1782e3ba04
+        http.addFilterBefore(new ValidateCodeFilter(),JWTAuthenticationFilter.class);
+        //全局解决流关闭不能重复读取参数的问题
+        http.addFilterBefore(new BodyReaderFilter(),ValidateCodeFilter.class);
         //用重写的Filter替换掉原有的UsernamePasswordAuthenticationFilter
-        //http://www.zzvips.com/article/176541.html
         //https://www.jianshu.com/p/693914564406
         http.addFilterAt(customAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         // 权限配置

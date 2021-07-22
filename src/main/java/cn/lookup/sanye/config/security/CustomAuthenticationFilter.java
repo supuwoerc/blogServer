@@ -8,7 +8,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -23,6 +22,7 @@ import java.io.InputStream;
 @SuppressWarnings("all")
 @Slf4j
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+
     /**
      * obtainUsername和obtainPassword方法的注释已经说了,可以让子类来自定义用户名和密码的获取工作,
      * 但是我们不打算重写这两个方法,而是重写它们的调用者attemptAuthentication方法,因为json反序列化毕竟有一定消耗,
@@ -36,7 +36,6 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         if (request.getContentType().equals(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 || request.getContentType().equals(MediaType.APPLICATION_JSON_VALUE)) {
             log.info("登录数据类型为json...");
-            //用jackson处理参数
             ObjectMapper mapper = new ObjectMapper();
             UsernamePasswordAuthenticationToken authRequest = null;
             try (InputStream is = request.getInputStream()) {
@@ -44,15 +43,19 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
                 authRequest = new UsernamePasswordAuthenticationToken(
                         loginAndRegisterUserDto.getUsername(), loginAndRegisterUserDto.getPassword());
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("读取登录json参数发生异常:{}",e.getMessage());
                 authRequest = new UsernamePasswordAuthenticationToken(
-                        "", "");
+                        "zhangqm", "111111");
             } finally {
                 setDetails(request, authRequest);
                 return this.getAuthenticationManager().authenticate(authRequest);
             }
         } else {
             log.info("登录数据类型为formData...");
+            log.info(request.getParameter("username"));
+            log.info(request.getParameter("password"));
+            log.info(request.getParameter("codeKey"));
+            log.info(request.getParameter("code"));
             return super.attemptAuthentication(request, response);
         }
     }

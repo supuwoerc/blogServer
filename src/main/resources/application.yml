@@ -58,4 +58,4 @@ jwt:
   # 过期时间，单位秒
   expiration: 604800
   # 配置白名单（不需要认证）
-  antMatchers: /,/login/**,/register/**,/static/**,/index.html,/swagger-resources/**,/webjars/**,/v2/api-docs,/captcha
+  antMatchers: /,/login/**,/register/**,/static/**,/index.html,/swagger-resources/**,/webjars/**,/v2/api-docs,/captcha,/user/test

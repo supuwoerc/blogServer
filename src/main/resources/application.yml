@@ -35,11 +35,12 @@ captcha:
   size: 2
 #自定义是否开启swagger2文档
 swagger:
-  enable:true
+  enable: true
 #springboot自带的logback配置
 logging:
   file:
-    path: /app/log
+    path: ./log
+    max-size: 10MB
   level:
     root: info
 mybatis-plus:
@@ -58,4 +59,4 @@ jwt:
   # 过期时间，单位秒
   expiration: 604800
   # 配置白名单（不需要认证）
-  antMatchers: /,/login/**,/register/**,/static/**,/index.html,/swagger-resources/**,/webjars/**,/v2/api-docs,/captcha,/user/test
+  antMatchers: /,/login/**,/register/**,/static/**,/index.html,/swagger-resources/**,/webjars/**,/v2/api-docs,/doc.html,/captcha,/user/**

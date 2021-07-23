@@ -1,15 +1,12 @@
 package cn.lookup.sanye.config.security;
 
-import cn.lookup.sanye.config.filter.BodyReaderFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -17,7 +14,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.stereotype.Component;
 
 /**
  * @Author: zhangqm<sanye>
@@ -43,6 +39,8 @@ public class SysSecurityConfig extends WebSecurityConfigurerAdapter {
     private UserAuthenticationProvider userAuthenticationProvider; //登录验证处理
     @Autowired
     private UserPermissionEvaluator userPermissionEvaluator;  //用户权限注解
+    @Autowired
+    private ValidateCodeFilter validateCodeFilter;  //验证码
     /**
      * 密码编码
      * @return
@@ -75,19 +73,15 @@ public class SysSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         // 添加JWT过滤器
         http.addFilterBefore(new JWTAuthenticationFilter(),UsernamePasswordAuthenticationFilter.class);
-        //添加登录校验验证码验证码的过滤器(在读取json时用了将request转inputStream的方式，会导致下一个过滤器(CustomAuthenticationFilter)没法读取参数)
-        //https://www.jianshu.com/p/ec1782e3ba04
-        http.addFilterBefore(new ValidateCodeFilter(),JWTAuthenticationFilter.class);
-        //全局解决流关闭不能重复读取参数的问题
-        http.addFilterBefore(new BodyReaderFilter(),ValidateCodeFilter.class);
-        //用重写的Filter替换掉原有的UsernamePasswordAuthenticationFilter
-        //https://www.jianshu.com/p/693914564406
-        http.addFilterAt(customAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        // 添加校验验证码
+        http.addFilterBefore(validateCodeFilter,JWTAuthenticationFilter.class);
         // 权限配置
         http.authorizeRequests()
                 .antMatchers(JWTConfig.antMatchers.split(",")).permitAll()// 获取白名单（不进行权限验证）
                 .anyRequest().authenticated() // 其他的需要登陆后才能访问
                 .and().formLogin().loginProcessingUrl("/login/submit")// 配置登录URL
+                .successHandler(userLoginSuccessHandler) // 配置登录成功处理类
+                .failureHandler(userLoginFailureHandler) // 配置登录失败处理类
                 .and().logout().logoutUrl("/logout/submit")// 配置登出地址
                 .logoutSuccessHandler(userLogoutSuccessHandler) // 配置用户登出处理类
                 .and().exceptionHandling().accessDeniedHandler(userAccessDeniedHandler)// 配置没有权限处理类
@@ -97,22 +91,4 @@ public class SysSecurityConfig extends WebSecurityConfigurerAdapter {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS); // 禁用session（使用Token认证）
         http.headers().cacheControl(); // 禁用缓存
     }
-    /*注册自定义的UsernamePasswordAuthenticationFilter来登录(springSecurity默认接受formData的数据,
-    CustomAuthenticationFilter扩展为支持json的方式，添加重写的过滤器需要指定登陆成功和登录失败的处理器)*/
-    @Bean
-    CustomAuthenticationFilter customAuthenticationFilter() throws Exception {
-        CustomAuthenticationFilter filter = new CustomAuthenticationFilter();
-        filter.setAuthenticationSuccessHandler(userLoginSuccessHandler); // 配置登录成功处理类
-        filter.setAuthenticationFailureHandler(userLoginFailureHandler); // 配置登录失败处理类
-        //这句很关键，重用WebSecurityConfigurerAdapter配置的AuthenticationManager，不然要自己组装AuthenticationManager
-        filter.setAuthenticationManager(authenticationManagerBean());
-        filter.setFilterProcessesUrl("/login/submit");
-        return filter;
-    }
-    @Bean
-    @Override
-    protected AuthenticationManager authenticationManager() throws Exception {
-        return super.authenticationManager();
-    }
-
 }

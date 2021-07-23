@@ -27,6 +27,7 @@ import java.io.IOException;
  **/
 @Slf4j
 @SuppressWarnings({"all"})
+@Component
 public class ValidateCodeFilter extends GenericFilterBean {
     @Autowired
     private RedisUtil redisUtil;
@@ -41,23 +42,12 @@ public class ValidateCodeFilter extends GenericFilterBean {
         HttpServletResponse httpServletResponse = (HttpServletResponse) servletResponse;
         if ((projectName + "/login/submit").equalsIgnoreCase(httpServletRequest.getRequestURI())
                 && "post".equalsIgnoreCase(httpServletRequest.getMethod())) {
-            if ((httpServletRequest.getContentType().equals(MediaType.APPLICATION_JSON_UTF8_VALUE)
-                    || httpServletRequest.getContentType().equals(MediaType.APPLICATION_JSON_VALUE))) {
-                try (ServletInputStream is = httpServletRequest.getInputStream()) {
-                    ObjectMapper objectMapper = new ObjectMapper();
-                    LoginAndRegisterUserDto dto = objectMapper.readValue(is, LoginAndRegisterUserDto.class);
-                    validateCode(dto.getCode(), dto.getCodeKey());
-                } catch (BadCredentialsException e) {
-                    userLoginFailureHandler.onAuthenticationFailure(httpServletRequest, httpServletResponse, e);
-                    return;
-                }
-            } else {
-                try {
-                    validateCode(httpServletRequest.getParameter("code"), httpServletRequest.getParameter("codeKey"));
-                } catch (BadCredentialsException e) {
-                    userLoginFailureHandler.onAuthenticationFailure(httpServletRequest, httpServletResponse, e);
-                    return;
-                }
+            log.info("登录校验验证码...");
+            try {
+                validateCode(httpServletRequest.getParameter("code"), httpServletRequest.getParameter("codeKey"));
+            } catch (BadCredentialsException e) {
+                userLoginFailureHandler.onAuthenticationFailure(httpServletRequest, httpServletResponse, e);
+                return;
             }
         }
         filterChain.doFilter(servletRequest, servletResponse);
@@ -67,13 +57,12 @@ public class ValidateCodeFilter extends GenericFilterBean {
         if (redisUtil.hasKey(codeKey)) {
             String realCode = (String) redisUtil.get(codeKey);
             if (StringUtils.isEmpty(realCode) || !realCode.equalsIgnoreCase(code)) {
-                log.info("验证码错误",realCode,code,realCode.equalsIgnoreCase(code));
                 throw new BadCredentialsException("验证码错误");
             }
             log.info("验证码验证通过");
         } else {
             log.info("验证码codeKey不存在");
-            throw new BadCredentialsException("验证码错误");
+            throw new BadCredentialsException("验证码失效");
         }
     }
 }

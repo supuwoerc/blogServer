@@ -19,6 +19,6 @@ import java.io.IOException;
 public class UserLoginFailureHandler implements AuthenticationFailureHandler {
     @Override
     public void onAuthenticationFailure(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AuthenticationException e) throws IOException, ServletException {
-        Result.write(500,"登陆失败",null,httpServletResponse);
+        Result.write(500,e.getMessage(),null,httpServletResponse);
     }
 }

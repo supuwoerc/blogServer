@@ -39,6 +39,18 @@ public class SysUserDetails extends User implements UserDetails, Serializable {
      */
     private boolean isEnabled = true;
     /**
+     * 客户端请求Ip
+     */
+    private String ip;
+    /**
+     * 过期时间
+     */
+    private String expiration;
+    /**
+     * 刷新时间
+     */
+    private String refreshTime;
+    /**
      * 获得用户权限
      */
     @Override

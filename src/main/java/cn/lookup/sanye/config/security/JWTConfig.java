@@ -31,7 +31,10 @@ public class JWTConfig {
      * 过期时间
      */
     public static Integer expiration;
-
+    /**
+     * 有效时间
+     */
+    public static Integer refreshTime;
     /**
      * 配置白名单
      */
@@ -45,7 +48,14 @@ public class JWTConfig {
     public void setExpiration(Integer expiration) {
         this.expiration = expiration * 1000;
     }
-
+    /**
+     * 将有效时间单位换算成毫秒
+     *
+     * @param refreshTime 有效时间，单位秒
+     */
+    public void setRefreshTime(Integer refreshTime) {
+        this.refreshTime = refreshTime * 24 * 60 * 60 * 1000;
+    }
     public void setSecret(String secret) {
         this.secret = secret;
     }

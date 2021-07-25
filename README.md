@@ -8,7 +8,7 @@
 * logback作为日志记录框架(springboot自带)
 * mail实现邮件发送
 * easy-captcha实现验证码
-### TOTO
+### TODO
 * 实现OAuth2.0实现常用微信，微博，QQ单点登录
 * 评论
 * RabbitMQ集成

@@ -3,7 +3,6 @@ package cn.lookup.sanye.config.security;
 import cn.lookup.sanye.pojo.Auth;
 import cn.lookup.sanye.pojo.SysUserDetails;
 import cn.lookup.sanye.service.SysUserService;
-import cn.lookup.sanye.service.impl.SysUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;

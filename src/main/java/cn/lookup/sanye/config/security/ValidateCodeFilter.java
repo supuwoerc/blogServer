@@ -59,6 +59,7 @@ public class ValidateCodeFilter extends GenericFilterBean {
             if (StringUtils.isEmpty(realCode) || !realCode.equalsIgnoreCase(code)) {
                 throw new BadCredentialsException("验证码错误");
             }
+            redisUtil.del(codeKey);
             log.info("验证码验证通过");
         } else {
             log.info("验证码codeKey不存在");

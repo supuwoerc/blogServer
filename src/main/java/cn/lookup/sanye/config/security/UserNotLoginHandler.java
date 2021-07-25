@@ -23,7 +23,6 @@ public class UserNotLoginHandler implements AuthenticationEntryPoint {
     public void commence(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AuthenticationException e) throws IOException, ServletException {
         httpServletResponse.setCharacterEncoding("UTF-8");
         httpServletResponse.setContentType("application/json;charset=utf-8");
-        httpServletResponse.setStatus(401);   //修改请求状态，不然就302重定向到登录页了
         Result result = Result.fail(401, "未登录", null);
         PrintWriter writer = httpServletResponse.getWriter();
         writer.write(new ObjectMapper().writeValueAsString(result));

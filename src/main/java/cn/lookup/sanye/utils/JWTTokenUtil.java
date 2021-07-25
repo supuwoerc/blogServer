@@ -3,14 +3,13 @@ package cn.lookup.sanye.utils;
 import cn.lookup.sanye.config.security.JWTConfig;
 import cn.lookup.sanye.pojo.SysUserDetails;
 import cn.lookup.sanye.service.impl.SysUserDetailsService;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
@@ -26,9 +25,10 @@ import java.util.*;
  */
 @Data
 @Slf4j
+@Component
 public class JWTTokenUtil {
     @Autowired
-    private static RedisUtil redisUtil;
+    private RedisUtil redisUtil;
     @Autowired
     private SysUserDetailsService sysUserDetailsService;
     private static JWTTokenUtil jwtTokenUtil;
@@ -37,12 +37,14 @@ public class JWTTokenUtil {
     private static final String CLAIM_KEY_USERNAME = "sub";   //账户名
     private static final String CLAIM_KEY_AUTHORITIES = "authorities"; //权限
     private static final String CLAIM_KEY_IP_ADDRESS = "ip"; //登录ip
-    private static final String CLAIM_KEY_IP_EXPIRATION = "expiration"; //过期时间
-    private static final String CLAIM_KEY_IP_REFRESH_TIME = "refreshTime"; //刷新时间
+    private static final String CLAIM_KEY_EXPIRATION = "expiration"; //过期时间
+    private static final String CLAIM_KEY_REFRESH_TIME = "refreshTime"; //刷新时间
     @PostConstruct
     private void init(){
         jwtTokenUtil = this;
+        jwtTokenUtil.redisUtil = redisUtil;
         jwtTokenUtil.sysUserDetailsService = sysUserDetailsService;
+        log.info("注入工具类和service，让静态方法可用");
     }
     /**
      * 生成jwt-token的方法
@@ -56,8 +58,8 @@ public class JWTTokenUtil {
         claims.put(CLAIM_KEY_USERNAME, sysUserDetails.getUsername());  //这里的claims信息可以进行扩展
         claims.put(CLAIM_KEY_AUTHORITIES, sysUserDetails.getAuthorities());
         claims.put(CLAIM_KEY_IP_ADDRESS, sysUserDetails.getIp());
-        claims.put(CLAIM_KEY_IP_EXPIRATION,dateTimeFormatter.format(localDateTime.plusSeconds(JWTConfig.expiration)));
-        claims.put(CLAIM_KEY_IP_REFRESH_TIME, dateTimeFormatter.format(localDateTime.plusSeconds(JWTConfig.refreshTime)));
+        claims.put(CLAIM_KEY_EXPIRATION,dateTimeFormatter.format(localDateTime.plusSeconds(JWTConfig.expiration/1000)));
+        claims.put(CLAIM_KEY_REFRESH_TIME, dateTimeFormatter.format(localDateTime.plusSeconds(JWTConfig.refreshTime/1000)));
         String token = Jwts.builder().setClaims(claims)  // 主体信息
                 .setIssuedAt(new Date())   //签发时间
                 .setExpiration(new Date(System.currentTimeMillis() + JWTConfig.expiration))//过期时间
@@ -82,7 +84,9 @@ public class JWTTokenUtil {
                 Claims claims = Jwts.parser().setSigningKey(JWTConfig.secret).parseClaimsJws(subToken).getBody();
                 sysUserDetails = new SysUserDetails();
                 sysUserDetails.setUsername(claims.getSubject());
-                sysUserDetails.setIp(claims.get(CLAIM_KEY_IP_ADDRESS).toString());
+                sysUserDetails.setIp((String) claims.get(CLAIM_KEY_IP_ADDRESS));
+                sysUserDetails.setExpiration((String) claims.get(CLAIM_KEY_EXPIRATION));
+                sysUserDetails.setRefreshTime((String) claims.get(CLAIM_KEY_REFRESH_TIME));
                 //从jwt中解析出角色
                 ArrayList<LinkedHashMap<String,String>> authoritiesFromToken = (ArrayList<LinkedHashMap<String, String>>) claims.get(CLAIM_KEY_AUTHORITIES);
                 Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
@@ -92,7 +96,8 @@ public class JWTTokenUtil {
                 }
                 sysUserDetails.setAuthorities(authorities);
             } catch (Exception e) {
-                log.error("jwt解析失败",e.getMessage());
+                e.printStackTrace();
+                log.error("jwt解析失败",e.getCause());
             }
         }
         return sysUserDetails;
@@ -103,10 +108,10 @@ public class JWTTokenUtil {
      * @param oldToken 过期但未超过刷新时间的Token
      * @return
      */
-    public static String refreshAccessToken(String oldToken) {
+    public static String refreshAccessToken(String oldToken,String ip) {
         String username = JWTTokenUtil.getUserNameByToken(oldToken);
         SysUserDetails sysUserDetails = (SysUserDetails) jwtTokenUtil.sysUserDetailsService.loadUserByUsername(username);
-        sysUserDetails.setIp(JWTTokenUtil.getIpByToken(oldToken));
+        sysUserDetails.setIp(ip);
         return createAccessToken(sysUserDetails);
     }
 
@@ -117,10 +122,11 @@ public class JWTTokenUtil {
     public static void saveToken2Redis(String token){
         if(!StringUtils.isEmpty(token)){
             SysUserDetails sysUserDetails = JWTTokenUtil.parseAccessToken(token);
-            redisUtil.hset(token,"username",sysUserDetails.getUsername(),JWTConfig.refreshTime);
-            redisUtil.hset(token,"ip",sysUserDetails.getIp(),JWTConfig.refreshTime);
-            redisUtil.hset(token,"expiration",sysUserDetails.getExpiration(),JWTConfig.refreshTime);
-            redisUtil.hset(token,"refreshTime",sysUserDetails.getRefreshTime(),JWTConfig.refreshTime);
+            token = token.substring(JWTConfig.tokenPrefix.length());
+            jwtTokenUtil.redisUtil.hset(token,"username",sysUserDetails.getUsername(),JWTConfig.refreshTime);
+            jwtTokenUtil.redisUtil.hset(token,"ip",sysUserDetails.getIp(),JWTConfig.refreshTime);
+            jwtTokenUtil.redisUtil.hset(token,"expiration",sysUserDetails.getExpiration(),JWTConfig.refreshTime);
+            jwtTokenUtil.redisUtil.hset(token,"refreshTime",sysUserDetails.getRefreshTime(),JWTConfig.refreshTime);
         }
     }
 
@@ -130,10 +136,10 @@ public class JWTTokenUtil {
      */
     public static void addBlackList(String token){
         if(!StringUtils.isEmpty(token)){
-            redisUtil.hset("black-list",token,dateTimeFormatter.format(LocalDateTime.now()));
+            token = token.substring(JWTConfig.tokenPrefix.length());
+            jwtTokenUtil.redisUtil.hset("black-list",token,dateTimeFormatter.format(LocalDateTime.now()));
         }
     }
-
     /**
      * 从redis删除token
      * @param token
@@ -141,7 +147,7 @@ public class JWTTokenUtil {
     public static void deleteTokenFromRedis(String token){
         if(!StringUtils.isEmpty(token)){
             token = token.substring(JWTConfig.tokenPrefix.length());
-            redisUtil.del(token);
+            jwtTokenUtil.redisUtil.del(token);
         }
     }
 
@@ -154,19 +160,19 @@ public class JWTTokenUtil {
         boolean result = false;
         if(!StringUtils.isEmpty(token)){
             token = token.substring(JWTConfig.tokenPrefix.length());
-            result = redisUtil.hHasKey("black-list",token);
+            result = jwtTokenUtil.redisUtil.hHasKey("black-list",token);
         }
         return result;
     }
     /**
-     * 判断token是不是过期了
+     * 判断redis中token是不是过期了
      * @param token true:过期了 false:未过期
      * @return
      */
     public static boolean isExpiration(String token){
         boolean result = false;
         if(!StringUtils.isEmpty(token)){
-            String expiration = JWTTokenUtil.parseAccessToken(token).getExpiration();
+            String expiration = (String) jwtTokenUtil.redisUtil.hget(token.substring(JWTConfig.tokenPrefix.length()), "expiration");
             LocalDateTime ex = LocalDateTime.parse(expiration, dateTimeFormatter);
             result = LocalDateTime.now().compareTo(ex)>0;
         }
@@ -181,7 +187,7 @@ public class JWTTokenUtil {
     public static boolean isCanRefresh(String token){
         boolean result = false;
         if(!StringUtils.isEmpty(token)){
-            String refreshTime = JWTTokenUtil.parseAccessToken(token).getRefreshTime();
+            String refreshTime = (String) jwtTokenUtil.redisUtil.hget(token.substring(JWTConfig.tokenPrefix.length()), "refreshTime");
             LocalDateTime ex = LocalDateTime.parse(refreshTime, dateTimeFormatter);
             result = LocalDateTime.now().compareTo(ex)<0;
         }
@@ -196,32 +202,32 @@ public class JWTTokenUtil {
     public static boolean hasToken(String token) {
         if (!StringUtils.isEmpty(token)) {
             token = token.substring(JWTConfig.tokenPrefix.length());
-            return redisUtil.hasKey(token);
+            return jwtTokenUtil.redisUtil.hasKey(token);
         }
         return false;
     }
     /**
-     * 从token解析出用户名
+     * 从redis存在的token解析出用户名
      * @param token token字符串
      * @return 用户名
      */
     public static String getUserNameByToken(String token) {
         String username = null;
         if(!StringUtils.isEmpty(token)){
-            username = JWTTokenUtil.parseAccessToken(token).getUsername();
+            username = (String) jwtTokenUtil.redisUtil.hget(token.substring(JWTConfig.tokenPrefix.length()), "username");
         }
         return username;
     }
 
     /**
-     * 从token中解析的登录ip
+     * 从redis存在的token中解析的登录ip
      * @param token
      * @return ip地址
      */
     public static String getIpByToken(String token) {
         String ipAddress = null;
         if(!StringUtils.isEmpty(token)){
-            ipAddress = JWTTokenUtil.parseAccessToken(token).getIp();
+            ipAddress = (String) jwtTokenUtil.redisUtil.hget(token.substring(JWTConfig.tokenPrefix.length()), "ip");
         }
         return ipAddress;
     }

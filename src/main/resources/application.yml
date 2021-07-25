@@ -57,7 +57,7 @@ jwt:
   # Token前缀
   tokenPrefix: Bearer
   # 过期时间，单位秒
-  expiration: 604800
+  expiration: 90
   # 刷新时间，单位天
   refreshTime: 7
   # 配置白名单（不需要认证）

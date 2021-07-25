@@ -140,6 +140,17 @@ public class JWTTokenUtil {
             jwtTokenUtil.redisUtil.hset("black-list",token,dateTimeFormatter.format(LocalDateTime.now()));
         }
     }
+
+    /**
+     * 从黑名单删除token
+     * @param token
+     */
+    public static void deleteTokenFromBlackList(String token){
+        if(!StringUtils.isEmpty(token)){
+            token = token.substring(JWTConfig.tokenPrefix.length());
+            jwtTokenUtil.redisUtil.hdel("black-list",token);
+        }
+    }
     /**
      * 从redis删除token
      * @param token

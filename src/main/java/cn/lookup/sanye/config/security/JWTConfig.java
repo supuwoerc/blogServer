@@ -54,8 +54,7 @@ public class JWTConfig {
      * @param refreshTime 有效时间，单位秒
      */
     public void setRefreshTime(Integer refreshTime) {
-        //this.refreshTime = refreshTime * 24 * 60 * 60 * 1000;
-        this.refreshTime = 60000;
+        this.refreshTime = refreshTime * 24 * 60 * 60 * 1000;
     }
     public void setSecret(String secret) {
         this.secret = secret;

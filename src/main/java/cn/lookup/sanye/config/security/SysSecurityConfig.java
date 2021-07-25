@@ -1,5 +1,6 @@
 package cn.lookup.sanye.config.security;
 
+import cn.lookup.sanye.config.ProjectInfoBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;

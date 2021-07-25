@@ -1,15 +1,17 @@
 package cn.lookup.sanye.config.security;
 
 import cn.lookup.sanye.common.vo.Result;
+import cn.lookup.sanye.config.ProjectInfoBean;
 import cn.lookup.sanye.pojo.SysUserDetails;
 import cn.lookup.sanye.utils.AccessAddressUtils;
 import cn.lookup.sanye.utils.JWTTokenUtil;
-import cn.lookup.sanye.utils.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -17,6 +19,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 
 /**
@@ -32,6 +35,13 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
         String token = request.getHeader(JWTConfig.tokenHeader);
+        String[] dontNeedFilter = JWTConfig.antMatchers.split(",");
+        //https://blog.csdn.net/xgangzai/article/details/118980297
+        String path = request.getRequestURI().substring(ProjectInfoBean.projectName.length());
+        if(Arrays.asList(dontNeedFilter).contains(path)){
+            chain.doFilter(request, response);
+            return;
+        }
         if (token != null && token.startsWith(JWTConfig.tokenPrefix)) {
             //黑名单的token
             if(JWTTokenUtil.isInBlackList(token)){
@@ -53,10 +63,9 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                         Result.write(502,"收到船新令牌",newToken,response);
                         return;
                     }else{
-                        JWTTokenUtil.addBlackList(token);
                         JWTTokenUtil.deleteTokenFromRedis(token);
-                        log.info("用户{}token过期,不可刷新,已经添加到token黑名单");
-                        Result.write(500,"登录令牌已失效",null,response);
+                        log.info("用户{}token过期,不可刷新,需要重新登录");
+                        Result.write(501,"登录令牌已失效",null,response);
                         return;
                     }
                 }else{

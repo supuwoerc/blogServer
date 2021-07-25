@@ -6,8 +6,6 @@ import cn.lookup.sanye.pojo.SysUserDetails;
 import cn.lookup.sanye.utils.AccessAddressUtils;
 import cn.lookup.sanye.utils.JWTTokenUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;

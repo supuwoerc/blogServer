@@ -3,6 +3,7 @@ package cn.lookup.sanye.config.security;
 import cn.lookup.sanye.pojo.SysUserDetails;
 import cn.lookup.sanye.service.impl.SysUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.LockedException;
@@ -21,6 +22,8 @@ import org.springframework.stereotype.Component;
 public class UserAuthenticationProvider implements AuthenticationProvider {
     @Autowired
     private SysUserDetailsService sysUserDetailsService;
+    //这里懒加载,因为passwordEncoder来自SysSecurityConfig,而SysSecurityConfig又注入了UserAuthenticationProvider,形成循环注入
+    @Lazy
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Override

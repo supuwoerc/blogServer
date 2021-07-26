@@ -73,8 +73,11 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                         setSecurityContextBySysUserDetails(sysUserDetails);
                     }
                 }
+            }else{
+                //redis中不存在这个token,可能是伪造token,也可能是token失效
+                Result.write(501,"登录令牌已失效",null,response);
+                return;
             }
-
         }
         chain.doFilter(request, response);
     }

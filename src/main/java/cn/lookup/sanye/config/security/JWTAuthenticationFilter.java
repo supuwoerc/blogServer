@@ -34,7 +34,6 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
         String token = request.getHeader(JWTConfig.tokenHeader);
         String[] dontNeedFilter = JWTConfig.antMatchers.split(",");
-        //https://blog.csdn.net/xgangzai/article/details/118980297
         String path = request.getRequestURI().substring(ProjectInfoBean.projectName.length());
         if(Arrays.asList(dontNeedFilter).contains(path)){
             chain.doFilter(request, response);

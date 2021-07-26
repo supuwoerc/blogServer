@@ -3,6 +3,7 @@ package cn.lookup.sanye.config.security;
 import cn.lookup.sanye.pojo.Auth;
 import cn.lookup.sanye.pojo.SysUserDetails;
 import cn.lookup.sanye.service.SysUserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
@@ -17,12 +18,15 @@ import java.util.List;
  * @Date: 2021/7/16 11:03
  * @Desc:用户访问权限处理（注解）
  **/
+@Slf4j
 @Component
 public class UserPermissionEvaluator implements PermissionEvaluator {
     @Autowired
     private SysUserService sysUserService;
+
     /**
      * 判断是否拥有权限
+     *
      * @param authentication 用户身份
      * @param targetUrl      目标路径
      * @param permission     路径权限
@@ -36,11 +40,10 @@ public class UserPermissionEvaluator implements PermissionEvaluator {
         for (Auth auth : authList) {
             permissions.add(auth.getPermission());
         }
+        boolean contains = permissions.contains(permission.toString());
         // 判断是否拥有权限
-        if (permissions.contains(permission.toString())) {
-            return true;
-        }
-        return false;
+        log.info("收到请求{},鉴权结果{}", targetUrl, contains);
+        return contains;
     }
 
     @Override

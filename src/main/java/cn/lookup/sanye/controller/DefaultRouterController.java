@@ -1,6 +1,7 @@
 package cn.lookup.sanye.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -15,6 +16,12 @@ public class DefaultRouterController {
     @RequestMapping("/")
     public String defaultPage(){
         log.info("访问服务,重定向到接口文档地址...");
+        return "redirect:/doc.html";
+    }
+    @RequestMapping("/permission")
+    @PreAuthorize("hasPermission('/permission','sys:test')")
+    public String permissionTest(){
+        log.info("测试权限通过,重定向到接口文档地址...");
         return "redirect:/doc.html";
     }
 }

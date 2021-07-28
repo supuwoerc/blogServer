@@ -28,6 +28,12 @@ public interface SysUserService extends IService<User> {
      */
     List<Role> findRolesByUserId(Long userId);
     /**
+     * 根据账户名查询角色
+     * @param userName 账户名
+     * @return
+     */
+    List<Role> findRolesByUserName(String userName);
+    /**
      * 根据账户id查询权限
      * @param userId
      * @return

@@ -56,6 +56,15 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, User> impleme
         return this.baseMapper.findRolesByUserId(userId);
     }
     /**
+     * 根据用户名查询角色
+     * @param userName 用户ID
+     * @return
+     */
+    @Override
+    public List<Role> findRolesByUserName(String userName) {
+        return this.baseMapper.findRolesByUserName(userName);
+    }
+    /**
      * 根据用户ID查询权限
      * @param userId 用户ID
      * @return

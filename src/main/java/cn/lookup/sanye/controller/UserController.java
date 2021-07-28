@@ -2,6 +2,7 @@ package cn.lookup.sanye.controller;
 
 
 import cn.lookup.sanye.common.vo.Result;
+import cn.lookup.sanye.pojo.Role;
 import cn.lookup.sanye.pojo.SysUserDetails;
 import cn.lookup.sanye.pojo.User;
 import cn.lookup.sanye.service.SysUserService;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * <p>
@@ -34,6 +36,17 @@ public class UserController {
             User user = sysUserService.getOne(new QueryWrapper<User>().lambda().eq(User::getUsername,sysUserDetails.getUsername()));
             user.setPassword(null);
             return Result.success(user);
+        } catch (Exception e) {
+            return Result.fail("登录过期",null);
+        }
+    }
+    @GetMapping("/role")
+    public Result getUserRole(){
+        //获取当前上下文中的用户
+        try {
+            SysUserDetails sysUserDetails = (SysUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            List<Role> roles = sysUserService.findRolesByUserName(sysUserDetails.getUsername());
+            return Result.success(roles);
         } catch (Exception e) {
             return Result.fail("登录过期",null);
         }

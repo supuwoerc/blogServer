@@ -143,6 +143,7 @@ public class JWTTokenUtil {
             token = token.substring(JWTConfig.tokenPrefix.length());
             jwtTokenUtil.redisUtil.hdel("token-mapper",username);
             jwtTokenUtil.redisUtil.hset("black-list",token,dateTimeFormatter.format(LocalDateTime.now()));
+            jwtTokenUtil.redisUtil.del(token);
         }
     }
 

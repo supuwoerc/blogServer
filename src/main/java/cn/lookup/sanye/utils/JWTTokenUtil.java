@@ -116,17 +116,20 @@ public class JWTTokenUtil {
     }
 
     /**
-     * 将token存放到redis里面
+     * 将token存放到redis里面,同时映射用户名和token的对应关系
      * @param token
      */
     public static void saveToken2Redis(String token){
         if(!StringUtils.isEmpty(token)){
             SysUserDetails sysUserDetails = JWTTokenUtil.parseAccessToken(token);
             token = token.substring(JWTConfig.tokenPrefix.length());
+            //存储token
             jwtTokenUtil.redisUtil.hset(token,"username",sysUserDetails.getUsername(),JWTConfig.refreshTime);
             jwtTokenUtil.redisUtil.hset(token,"ip",sysUserDetails.getIp(),JWTConfig.refreshTime);
             jwtTokenUtil.redisUtil.hset(token,"expiration",sysUserDetails.getExpiration(),JWTConfig.refreshTime);
             jwtTokenUtil.redisUtil.hset(token,"refreshTime",sysUserDetails.getRefreshTime(),JWTConfig.refreshTime);
+            //映射关系
+            jwtTokenUtil.redisUtil.hset("token-mapper",sysUserDetails.getUsername(),token,JWTConfig.refreshTime);
         }
     }
 
@@ -136,7 +139,9 @@ public class JWTTokenUtil {
      */
     public static void addBlackList(String token){
         if(!StringUtils.isEmpty(token)){
+            String username = JWTTokenUtil.getUserNameByToken(token);
             token = token.substring(JWTConfig.tokenPrefix.length());
+            jwtTokenUtil.redisUtil.hdel("token-mapper",username);
             jwtTokenUtil.redisUtil.hset("black-list",token,dateTimeFormatter.format(LocalDateTime.now()));
         }
     }

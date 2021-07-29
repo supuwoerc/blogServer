@@ -25,13 +25,17 @@ import java.util.List;
 @Service
 public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements IMenuService {
     /**
-     * 根据账户名查询菜单
-     * @param userName
+     * 根据角色查询菜单
+     * @param roles 角色集合
      * @return
      */
     @Override
-    public List<Menu> findMenuByUserName(String userName) {
-        List<Menu> menus = this.baseMapper.findMenuByUserName(userName);
+    public List<Menu> findMenuByUserRoles(List<Role> roles) {
+        ArrayList<Long> ids = new ArrayList<>();
+        for (Role role : roles) {
+            ids.add(role.getId());
+        }
+        List<Menu> menus = this.baseMapper.findMenuByUserRoles(ids);
         return buildTreeMenu(menus,0L);
     }
     /**
@@ -50,5 +54,4 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements IM
         }
         return resultTree;
     }
-
 }

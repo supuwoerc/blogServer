@@ -3,6 +3,7 @@ package cn.lookup.sanye.mapper;
 import cn.lookup.sanye.pojo.Menu;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,9 +16,9 @@ import java.util.List;
  */
 public interface MenuMapper extends BaseMapper<Menu> {
     /**
-     * 根据账户名查询菜单
-     * @param userName
+     * 根据角色查询菜单
+     * @param ids
      * @return
      */
-    List<Menu> findMenuByUserName(String userName);
+    List<Menu> findMenuByUserRoles(ArrayList<Long> ids);
 }

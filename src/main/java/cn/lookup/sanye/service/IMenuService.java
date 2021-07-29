@@ -1,6 +1,7 @@
 package cn.lookup.sanye.service;
 
 import cn.lookup.sanye.pojo.Menu;
+import cn.lookup.sanye.pojo.Role;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
@@ -15,9 +16,9 @@ import java.util.List;
  */
 public interface IMenuService extends IService<Menu> {
     /**
-     * 根据账户名查询菜单
-     * @param userName
+     * 根据角色查询当前菜单(包括匿名用户)
+     * @param roles 角色集合
      * @return
      */
-    List<Menu> findMenuByUserName(String userName);
+    List<Menu> findMenuByUserRoles(List<Role> roles);
 }

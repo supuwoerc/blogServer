@@ -30,12 +30,14 @@ public class Role implements Serializable {
      */
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
-
     /**
      * 角色名称
      */
     @TableField("role_name")
     private String role_name;
-
-
+    /**
+     * 角色描述
+     */
+    @TableField("role_desc")
+    private String role_desc;
 }

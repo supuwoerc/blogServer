@@ -34,6 +34,7 @@ public class JWTTokenUtil {
     private static JWTTokenUtil jwtTokenUtil;
     //处理时间的格式化对象
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final String CLAIM_KEY_ID = "jti";  //账户id
     private static final String CLAIM_KEY_USERNAME = "sub";   //账户名
     private static final String CLAIM_KEY_AUTHORITIES = "authorities"; //权限
     private static final String CLAIM_KEY_IP_ADDRESS = "ip"; //登录ip
@@ -55,12 +56,14 @@ public class JWTTokenUtil {
     public static String createAccessToken(SysUserDetails sysUserDetails) {
         LocalDateTime localDateTime = LocalDateTime.now();
         HashMap<String, Object> claims = new HashMap<>();
-        claims.put(CLAIM_KEY_USERNAME, sysUserDetails.getUsername());  //这里的claims信息可以进行扩展
+        claims.put(CLAIM_KEY_ID, sysUserDetails.getId());
+        claims.put(CLAIM_KEY_USERNAME, sysUserDetails.getUsername());
         claims.put(CLAIM_KEY_AUTHORITIES, sysUserDetails.getAuthorities());
         claims.put(CLAIM_KEY_IP_ADDRESS, sysUserDetails.getIp());
         claims.put(CLAIM_KEY_EXPIRATION,dateTimeFormatter.format(localDateTime.plusSeconds(JWTConfig.expiration/1000)));
         claims.put(CLAIM_KEY_REFRESH_TIME, dateTimeFormatter.format(localDateTime.plusSeconds(JWTConfig.refreshTime/1000)));
-        String token = Jwts.builder().setClaims(claims)  // 主体信息
+        String token = Jwts.builder()
+                .setClaims(claims)  // 主体信息
                 .setIssuedAt(new Date())   //签发时间
                 .setExpiration(new Date(System.currentTimeMillis() + JWTConfig.expiration))//过期时间
                 .signWith(SignatureAlgorithm.HS512, JWTConfig.secret)  //加密算法和秘钥
@@ -83,6 +86,7 @@ public class JWTTokenUtil {
                 //解析token
                 Claims claims = Jwts.parser().setSigningKey(JWTConfig.secret).parseClaimsJws(subToken).getBody();
                 sysUserDetails = new SysUserDetails();
+                sysUserDetails.setId(Long.valueOf(claims.getId()));
                 sysUserDetails.setUsername(claims.getSubject());
                 sysUserDetails.setIp((String) claims.get(CLAIM_KEY_IP_ADDRESS));
                 sysUserDetails.setExpiration((String) claims.get(CLAIM_KEY_EXPIRATION));

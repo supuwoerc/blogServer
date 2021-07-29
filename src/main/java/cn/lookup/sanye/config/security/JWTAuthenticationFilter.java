@@ -23,8 +23,7 @@ import java.util.Collection;
 /**
  * @Author: zhangqm<sanye>
  * @Date: 2021/7/16 11:16
- * @Desc:JWTtoken过滤器
- * 1.加入黑名单后将拦截；
+ * @Desc:JWTtoken过滤器 1.加入黑名单后将拦截；
  * 2.Token过期但在刷新期间内将刷新Token；
  * 3.超过过期时间且超过刷新时间，将拦截；
  **/
@@ -35,37 +34,37 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         String token = request.getHeader(JWTConfig.tokenHeader);
         String[] dontNeedFilter = JWTConfig.antMatchers.split(",");
         String path = request.getRequestURI().substring(ProjectInfoBean.projectName.length());
-        if(Arrays.asList(dontNeedFilter).contains(path)){
+        if (Arrays.asList(dontNeedFilter).contains(path)) {
             chain.doFilter(request, response);
             return;
         }
         if (token != null && token.startsWith(JWTConfig.tokenPrefix)) {
             //黑名单的token
-            if(JWTTokenUtil.isInBlackList(token)){
-                Result.write(501,"登录已被注销",null,response);
+            if (JWTTokenUtil.isInBlackList(token)) {
+                Result.write(501, "登录已被注销", null, response);
                 return;
             }
             //token存在在redis,但需要校验token的时效性
-            if(JWTTokenUtil.hasToken(token)){
+            if (JWTTokenUtil.hasToken(token)) {
                 String ipAddress = AccessAddressUtils.getIpAddress(request);
                 //判断token是否过期
-                if(JWTTokenUtil.isExpiration(token)){
+                if (JWTTokenUtil.isExpiration(token)) {
                     //过期但还在刷新期限内
-                    if(JWTTokenUtil.isCanRefresh(token)){
+                    if (JWTTokenUtil.isCanRefresh(token)) {
                         //根据旧的token获取账户信息后,删除失效token,存储新的token
-                        String newToken = JWTTokenUtil.refreshAccessToken(token,ipAddress);
+                        String newToken = JWTTokenUtil.refreshAccessToken(token, ipAddress);
                         JWTTokenUtil.deleteTokenFromRedis(token);
                         JWTTokenUtil.saveToken2Redis(newToken);
                         log.info("用户{}token过期,但依然可刷新,已经更新token");
-                        Result.write(502,"收到船新令牌",newToken,response);
+                        Result.write(502, "收到船新令牌", newToken, response);
                         return;
-                    }else{
+                    } else {
                         JWTTokenUtil.deleteTokenFromRedis(token);
                         log.info("用户{}token过期,不可刷新,需要重新登录");
-                        Result.write(501,"登录令牌已失效",null,response);
+                        Result.write(501, "登录令牌已失效", null, response);
                         return;
                     }
-                }else{
+                } else {
                     //未过期
                     SysUserDetails sysUserDetails = JWTTokenUtil.parseAccessToken(token);
                     if (sysUserDetails != null) {
@@ -73,9 +72,9 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                         setSecurityContextBySysUserDetails(sysUserDetails);
                     }
                 }
-            }else{
+            } else {
                 //redis中不存在这个token,可能是伪造token,也可能是token失效
-                Result.write(501,"登录令牌已失效",null,response);
+                Result.write(501, "登录令牌已失效", null, response);
                 return;
             }
         }
@@ -84,9 +83,10 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
     /**
      * 将授权用户设置到上下文中
+     *
      * @param sysUserDetails
      */
-    private void setSecurityContextBySysUserDetails(SysUserDetails sysUserDetails){
+    private void setSecurityContextBySysUserDetails(SysUserDetails sysUserDetails) {
         if (sysUserDetails != null) {
             //设置上下文对象
             Collection<? extends GrantedAuthority> authorities = sysUserDetails.getAuthorities();

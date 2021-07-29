@@ -43,7 +43,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, User> impleme
     public User findUserByUserName(String username) {
 
         return this.baseMapper.selectOne(
-                new QueryWrapper<User>().lambda().eq(User::getUsername,username).ne(User::getStatus,-1));
+                new QueryWrapper<User>().lambda().eq(User::getUsername,username));
     }
 
     /**
@@ -95,7 +95,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, User> impleme
                 User user = new User();
                 user.setPassword(passwordEncoder.encode(password));
                 user.setUsername(username);
-                user.setStatus(0);
+                user.setStatus(-1);  //锁定状态,需要邮件激活
                 userService.save(user);
                 //设置用户角色
                 UserRole userRole = new UserRole();

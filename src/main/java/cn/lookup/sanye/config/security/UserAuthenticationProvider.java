@@ -36,7 +36,7 @@ public class UserAuthenticationProvider implements AuthenticationProvider {
             throw new BadCredentialsException("用户名或者密码错误");  //此处就是密码错误,但是为了安全所以模糊提示(在loadUserByUsername中就会校验账户存不存在)
         }
         if(sysUserDetails.getStatus().equals(-1)){
-            throw new LockedException("账户被锁定");
+            throw new LockedException("账户未激活");
         }
         return new UsernamePasswordAuthenticationToken(sysUserDetails,password,sysUserDetails.getAuthorities());
     }

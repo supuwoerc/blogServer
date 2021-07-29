@@ -51,4 +51,10 @@ public class UserController {
             return Result.fail("登录过期",null);
         }
     }
+    @PostMapping("/activeUser/{username}/{activeCode}")
+    public Result activeUser(@PathVariable("username") String username,@PathVariable("activeCode") String code){
+        System.out.println(username);
+        System.out.println(code);
+        return Result.success("激活成功");
+    }
 }

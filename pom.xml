@@ -106,6 +106,18 @@
             <version>0.9.1</version>
         </dependency>
         <!-- JWT依赖 -->
+        <!--mail邮件-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+        <!--mail-->
+        <!--模板(发送邮件用到了)-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+        <!--模板-->
     </dependencies>
     <build>
         <plugins>

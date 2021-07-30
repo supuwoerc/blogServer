@@ -7,6 +7,7 @@ import cn.lookup.sanye.pojo.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: zhangqm<sanye>
@@ -49,4 +50,12 @@ public interface SysUserService extends IService<User> {
      * @return
      */
     Result register(String username, String password, String codeKey, String code);
+
+    /**
+     * 邮件激活账户
+     * @param username
+     * @param code
+     * @return
+     */
+    Map<String,Object> activeUser(String username, String code);
 }

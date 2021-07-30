@@ -1,6 +1,7 @@
 package cn.lookup.sanye.config.security;
 
 import cn.lookup.sanye.common.vo.Result;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
@@ -19,6 +20,11 @@ import java.io.IOException;
 public class UserLoginFailureHandler implements AuthenticationFailureHandler {
     @Override
     public void onAuthenticationFailure(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AuthenticationException e) throws IOException, ServletException {
+        //锁定账户的情况下
+        if(e instanceof LockedException){
+            Result.write(555,e.getMessage(),null,httpServletResponse);
+        }
+        //其他情况
         Result.write(500,e.getMessage(),null,httpServletResponse);
     }
 }

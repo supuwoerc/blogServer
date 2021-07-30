@@ -9,15 +9,16 @@ import cn.lookup.sanye.service.SysUserService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
- *  前端控制器
+ * 前端控制器
  * </p>
  *
  * @author zhangqm<sanye>
@@ -29,32 +30,39 @@ public class UserController {
     @Autowired
     private SysUserService sysUserService;
     @GetMapping("/info")
-    public Result getUserInfo(){
+    public Result getUserInfo() {
         //获取当前上下文中的用户
         try {
             SysUserDetails sysUserDetails = (SysUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            User user = sysUserService.getOne(new QueryWrapper<User>().lambda().eq(User::getUsername,sysUserDetails.getUsername()));
+            User user = sysUserService.getOne(new QueryWrapper<User>().lambda().eq(User::getUsername, sysUserDetails.getUsername()));
             user.setPassword(null);
             return Result.success(user);
         } catch (Exception e) {
-            return Result.fail("登录过期",null);
+            return Result.fail("登录过期", null);
         }
     }
+
     @GetMapping("/role")
-    public Result getUserRole(){
+    public Result getUserRole() {
         //获取当前上下文中的用户
         try {
             SysUserDetails sysUserDetails = (SysUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             List<Role> roles = sysUserService.findRolesByUserName(sysUserDetails.getUsername());
             return Result.success(roles);
         } catch (Exception e) {
-            return Result.fail("登录过期",null);
+            return Result.fail("登录过期", null);
         }
     }
-    @PostMapping("/activeUser/{username}/{activeCode}")
-    public Result activeUser(@PathVariable("username") String username,@PathVariable("activeCode") String code){
+
+    @GetMapping("/activeUser/{username}/{activeCode}")
+    public ModelAndView activeUser(@PathVariable("username") String username, @PathVariable("activeCode") String code, ModelAndView modelAndView) {
         System.out.println(username);
         System.out.println(code);
-        return Result.success("激活成功");
+        Map<String, Object> result = sysUserService.activeUser(username, code);
+        modelAndView.setViewName("activeUserResult");
+        modelAndView.addObject("msg", result.get("msg"));
+        modelAndView.addObject("link", result.get("link"));
+        modelAndView.addObject("btn", result.get("btn"));
+        return modelAndView;
     }
 }

@@ -1,5 +1,7 @@
 package cn.lookup.sanye.service;
 
+import java.util.Map;
+
 /**
  * @Author: zhangqm<sanye>
  * @Date: 2021/7/29 18:19
@@ -37,5 +39,14 @@ public interface MailService {
      * @param rscId 图片ID，用于在<img>标签中使用，从而显示图片
      */
     void sendInlineResourceMail(String to, String subject, String content, String rscPath, String rscId);
+
+    /**
+     * 发送模板邮件
+     * @param receiver
+     * @param subject
+     * @param emailTemplate
+     * @param dataMap
+     */
+    void sendTemplateMail(String receiver, String subject, String emailTemplate, Map<String, Object> dataMap);
 
 }

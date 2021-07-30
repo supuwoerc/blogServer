@@ -9,22 +9,30 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Service;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.File;
+import java.util.Map;
 
 /**
  * @Author: zhangqm<sanye>
  * @Date: 2021/7/29 18:19
  * @Desc:邮件发送实现类
  **/
+@Service
 public class MailServiceImpl implements MailService {
     private final Logger logger = LoggerFactory.getLogger(MailServiceImpl.class);
     @Value("${spring.mail.username}")
     private String from;
     @Autowired
     private JavaMailSender mailSender;
+    @Autowired
+    private TemplateEngine templateEngine;
+
     @Override
     public void sendSimpleMail(String to, String subject, String content) {
 
@@ -36,6 +44,7 @@ public class MailServiceImpl implements MailService {
 
         mailSender.send(message);
     }
+
     @Override
     public void sendHtmlMail(String to, String subject, String content) {
 
@@ -54,6 +63,7 @@ public class MailServiceImpl implements MailService {
             logger.error("发送HTML邮件失败：", e);
         }
     }
+
     @Override
     public void sendAttachmentMail(String to, String subject, String content, String filePath) {
 
@@ -78,6 +88,7 @@ public class MailServiceImpl implements MailService {
 
 
     }
+
     @Override
     public void sendInlineResourceMail(String to, String subject, String content, String rscPath, String rscId) {
         logger.info("发送带图片邮件开始：{},{},{},{},{}", to, subject, content, rscPath, rscId);
@@ -95,6 +106,27 @@ public class MailServiceImpl implements MailService {
             logger.info("发送带图片邮件成功");
         } catch (MessagingException e) {
             logger.error("发送带图片邮件失败", e);
+        }
+    }
+
+    @Override
+    public void sendTemplateMail(String receiver, String subject, String emailTemplate, Map<String, Object> dataMap) {
+        logger.info("发送模板邮件开始：{},{},{}", receiver, subject, emailTemplate);
+        MimeMessage message = mailSender.createMimeMessage();
+        Context context = new Context();
+        for (Map.Entry<String, Object> entry : dataMap.entrySet()) {
+            context.setVariable(entry.getKey(), entry.getValue());
+        }
+        String html = templateEngine.process(emailTemplate, context);
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setFrom(from);
+            helper.setTo(receiver);
+            helper.setSubject(subject);
+            helper.setText(html, true);
+            mailSender.send(message);
+        } catch (MessagingException e) {
+            logger.error("发送模板邮件失败", e);
         }
     }
 }

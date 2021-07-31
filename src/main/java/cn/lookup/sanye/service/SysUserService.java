@@ -6,6 +6,7 @@ import cn.lookup.sanye.pojo.Role;
 import cn.lookup.sanye.pojo.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import javax.validation.constraints.Email;
 import java.util.List;
 import java.util.Map;
 
@@ -58,4 +59,11 @@ public interface SysUserService extends IService<User> {
      * @return
      */
     Map<String,Object> activeUser(String username, String code);
+
+    /**
+     * 重新发送激活邮件
+     * @param username
+     * @return
+     */
+    Result reSendActiveMail(@Email(message = "邮箱格式错误") String username);
 }

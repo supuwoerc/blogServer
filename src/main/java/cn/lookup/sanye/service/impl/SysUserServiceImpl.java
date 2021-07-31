@@ -20,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import javax.validation.constraints.Email;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -168,5 +169,25 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, User> impleme
             result.put("btn", "去注册");
         }
         return result;
+    }
+
+    /**
+     * 重新发送激活邮件
+     * @param username
+     * @return
+     */
+    @Override
+    public Result reSendActiveMail(@Email(message = "邮箱格式错误") String username) {
+        User user = userService.getOne(new QueryWrapper<User>().lambda().eq(User::getUsername, username).eq(User::getStatus,-1));
+        if(user!=null){
+            HashMap<String, Object> dataMap = new HashMap<>();
+            String uuid = UUID.randomUUID().toString();
+            redisUtil.hset("active-mapper", username, uuid, 60 * 60);  //有效期1小时
+            dataMap.put("activeLink", ProjectInfoBean.getServerUrl() + "/user/activeUser/" + username + "/" + uuid);
+            mailService.sendTemplateMail(username, "激活账户", "activeUserTemplate.html", dataMap);
+            return Result.success("邮件发送成功");
+        }else{
+            return Result.fail("账户不存在或已激活");
+        }
     }
 }

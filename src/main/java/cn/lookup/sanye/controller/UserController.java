@@ -10,9 +10,11 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.Model;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.validation.constraints.Email;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +31,11 @@ import java.util.Map;
 public class UserController {
     @Autowired
     private SysUserService sysUserService;
+
+    /**
+     * 获取当前登录人信息
+     * @return
+     */
     @GetMapping("/info")
     public Result getUserInfo() {
         //获取当前上下文中的用户
@@ -42,6 +49,10 @@ public class UserController {
         }
     }
 
+    /**
+     * 获取当前登录人角色
+     * @return
+     */
     @GetMapping("/role")
     public Result getUserRole() {
         //获取当前上下文中的用户
@@ -54,6 +65,13 @@ public class UserController {
         }
     }
 
+    /**
+     * 激活账户
+     * @param username
+     * @param code
+     * @param modelAndView
+     * @return
+     */
     @GetMapping("/activeUser/{username}/{activeCode}")
     public ModelAndView activeUser(@PathVariable("username") String username, @PathVariable("activeCode") String code, ModelAndView modelAndView) {
         System.out.println(username);
@@ -64,5 +82,9 @@ public class UserController {
         modelAndView.addObject("link", result.get("link"));
         modelAndView.addObject("btn", result.get("btn"));
         return modelAndView;
+    }
+    @PostMapping("/reActiveUser/{username}")
+    public Result reSendMail(@Email(message = "邮箱格式错误") @PathVariable("username") String username) {
+        return sysUserService.reSendActiveMail(username);
     }
 }

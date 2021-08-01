@@ -147,8 +147,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, User> impleme
             if (user.getStatus().equals(-1)) {
                 if (!redisUtil.hHasKey("active-mapper", username) || !redisUtil.hget("active-mapper", username).equals(code)) {
                     result.put("msg", "激活邮件已过期");
-                    result.put("link", ProjectInfoBean.getServerUrl() + "/reactiveUser/" + username + "/");
-                    result.put("btn", "重新获取");
+                    result.put("btn", "请重新获取激活邮件");
                     return result;
                 }
                 User temp = new User();
@@ -156,17 +155,14 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, User> impleme
                 this.baseMapper.update(temp,new UpdateWrapper<User>().eq("username",username));
                 redisUtil.hdel("active-mapper",username);
                 result.put("msg", "激活成功");
-                result.put("link", ProjectInfoBean.getServerUrl());
-                result.put("btn", "去登录");
+                result.put("btn", "可以登录啦");
             } else {
                 result.put("msg", "账户已被激活");
-                result.put("link", ProjectInfoBean.getServerUrl());
-                result.put("btn", "去登录");
+                result.put("btn", "可以登录啦");
             }
         } else {
             result.put("msg", "账户不存在");
-            result.put("link", ProjectInfoBean.getServerUrl());
-            result.put("btn", "去注册");
+            result.put("btn", "请去注册");
         }
         return result;
     }
@@ -185,9 +181,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, User> impleme
             redisUtil.hset("active-mapper", username, uuid, 60 * 60);  //有效期1小时
             dataMap.put("activeLink", ProjectInfoBean.getServerUrl() + "/user/activeUser/" + username + "/" + uuid);
             mailService.sendTemplateMail(username, "激活账户", "activeUserTemplate.html", dataMap);
-            return Result.success("邮件发送成功");
+            return Result.success("邮件发送成功",null);
         }else{
-            return Result.fail("账户不存在或已激活");
+            return Result.fail("账户不存在或已激活",null);
         }
     }
 }

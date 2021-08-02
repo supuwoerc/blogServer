@@ -177,7 +177,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, User> impleme
         User user = userService.getOne(new QueryWrapper<User>().lambda().eq(User::getUsername, username).eq(User::getStatus,-1));
         if(user!=null){
             if(redisUtil.hHasKey("active-mapper",username)){
-                return Result.fail("请求太过频繁",null);
+                return Result.fail("请勿重复获取(有效期10分钟)",null);
             }
             HashMap<String, Object> dataMap = new HashMap<>();
             String uuid = UUID.randomUUID().toString();

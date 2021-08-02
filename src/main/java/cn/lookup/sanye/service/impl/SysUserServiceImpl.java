@@ -124,7 +124,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, User> impleme
                 userRoleService.save(userRole);
                 HashMap<String, Object> dataMap = new HashMap<>();
                 String uuid = UUID.randomUUID().toString();
-                redisUtil.hset("active-mapper", username, uuid, 60 * 60);  //有效期1小时
+                redisUtil.hset("active-mapper", username, uuid, 10 * 60);  //有效期1小时
                 dataMap.put("activeLink", ProjectInfoBean.getServerUrl() + "/user/activeUser/" + username + "/" + uuid);
                 mailService.sendTemplateMail(username, "激活账户", "activeUserTemplate.html", dataMap);
                 return Result.success(200, "注册成功", null);
@@ -176,9 +176,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, User> impleme
     public Result reSendActiveMail(@Email(message = "邮箱格式错误") String username) {
         User user = userService.getOne(new QueryWrapper<User>().lambda().eq(User::getUsername, username).eq(User::getStatus,-1));
         if(user!=null){
+            if(redisUtil.hHasKey("active-mapper",username)){
+                return Result.fail("请求太过频繁",null);
+            }
             HashMap<String, Object> dataMap = new HashMap<>();
             String uuid = UUID.randomUUID().toString();
-            redisUtil.hset("active-mapper", username, uuid, 60 * 60);  //有效期1小时
+            redisUtil.hset("active-mapper", username, uuid, 10 * 60);  //有效期
             dataMap.put("activeLink", ProjectInfoBean.getServerUrl() + "/user/activeUser/" + username + "/" + uuid);
             mailService.sendTemplateMail(username, "激活账户", "activeUserTemplate.html", dataMap);
             return Result.success("邮件发送成功",null);

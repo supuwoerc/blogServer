@@ -76,9 +76,10 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/userList")
     public Result getUserList(@RequestParam(value = "role",required = false) String role,@RequestParam(value = "page",required = false,defaultValue = "1") long page,
-                              @RequestParam(value = "size",required = false,defaultValue = "10") long size){
+                              @RequestParam(value = "size",required = false,defaultValue = "10") long size,
+                              @RequestParam(value = "keyWord",required = false,defaultValue = "") String keyWord){
         Page<User> userPage = new Page<>(page,size);
-        return sysUserService.getUserList(userPage,role);
+        return sysUserService.getUserList(userPage,role,keyWord);
     }
     /**
      * 激活账户

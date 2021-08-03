@@ -60,6 +60,9 @@
 			<if test="role_name!=null and role_name!=''">
 				and r.role_name = #{role_name}
 			</if>
+			<if test="keyWord!=null and keyWord!=''">
+				and u.nickname like concat("%",#{keyWord},"%")
+			</if>
 		</where>
 		order by u.id asc
 	</select>

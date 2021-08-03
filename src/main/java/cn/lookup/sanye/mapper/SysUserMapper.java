@@ -40,5 +40,5 @@ public interface SysUserMapper extends BaseMapper<User> {
      * @param role_name
      * @return
      */
-    IPage<User> getUserList(Page<User> page, String role_name);
+    IPage<User> getUserList(Page<User> page, String role_name,String keyWord);
 }

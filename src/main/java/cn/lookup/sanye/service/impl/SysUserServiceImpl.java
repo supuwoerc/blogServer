@@ -199,8 +199,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, User> impleme
      * @return
      */
     @Override
-    public Result getUserList(Page<User> userPage, String role) {
-        IPage<User> userList = this.baseMapper.getUserList(userPage,role);
+    public Result getUserList(Page<User> userPage, String role,String keyWord) {
+        IPage<User> userList = this.baseMapper.getUserList(userPage,role,keyWord);
         return Result.success(userList);
     }
 

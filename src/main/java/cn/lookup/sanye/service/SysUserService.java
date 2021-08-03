@@ -74,5 +74,5 @@ public interface SysUserService extends IService<User> {
      * @param role
      * @return
      */
-    Result getUserList(Page<User> userPage, String role);
+    Result getUserList(Page<User> userPage, String role,String keyWord);
 }

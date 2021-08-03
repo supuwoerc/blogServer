@@ -7,10 +7,10 @@ import cn.lookup.sanye.pojo.SysUserDetails;
 import cn.lookup.sanye.pojo.User;
 import cn.lookup.sanye.service.SysUserService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.ui.Model;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -66,6 +66,21 @@ public class UserController {
     }
 
     /**
+     * 需要管理员权限
+     * 查询用户列表,可选参数用户角色role
+     * @param role
+     * @param page
+     * @param size
+     * @return
+     */
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/userList")
+    public Result getUserList(@RequestParam(value = "role",required = false) String role,@RequestParam(value = "page",required = false,defaultValue = "1") long page,
+                              @RequestParam(value = "size",required = false,defaultValue = "10") long size){
+        Page<User> userPage = new Page<>(page,size);
+        return sysUserService.getUserList(userPage,role);
+    }
+    /**
      * 激活账户
      * @param username
      * @param code
@@ -83,6 +98,12 @@ public class UserController {
         modelAndView.addObject("btn", result.get("btn"));
         return modelAndView;
     }
+
+    /**
+     * 发送激活邮件到指定账户
+     * @param username
+     * @return
+     */
     @PostMapping("/reActiveUser/{username}")
     public Result reSendMail(@Email(message = "邮箱格式错误") @PathVariable("username") String username) {
         return sysUserService.reSendActiveMail(username);

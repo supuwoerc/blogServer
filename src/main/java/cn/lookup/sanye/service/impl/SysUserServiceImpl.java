@@ -14,6 +14,8 @@ import cn.lookup.sanye.service.SysUserService;
 import cn.lookup.sanye.utils.RedisUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -189,4 +191,17 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, User> impleme
             return Result.fail("账户不存在或已激活",null);
         }
     }
+
+    /**
+     * 查询用户列表
+     * @param userPage
+     * @param role
+     * @return
+     */
+    @Override
+    public Result getUserList(Page<User> userPage, String role) {
+        IPage<User> userList = this.baseMapper.getUserList(userPage,role);
+        return Result.success(userList);
+    }
+
 }

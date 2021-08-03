@@ -4,6 +4,8 @@ import cn.lookup.sanye.pojo.Auth;
 import cn.lookup.sanye.pojo.Role;
 import cn.lookup.sanye.pojo.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -32,4 +34,11 @@ public interface SysUserMapper extends BaseMapper<User> {
      * @return
      */
     List<Auth> findAuthsByUserId(Long userId);
+
+    /**
+     * 查询用户列表
+     * @param role_name
+     * @return
+     */
+    IPage<User> getUserList(Page<User> page, String role_name);
 }

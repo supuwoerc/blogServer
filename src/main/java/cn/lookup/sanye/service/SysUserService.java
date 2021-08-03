@@ -4,6 +4,7 @@ import cn.lookup.sanye.common.vo.Result;
 import cn.lookup.sanye.pojo.Auth;
 import cn.lookup.sanye.pojo.Role;
 import cn.lookup.sanye.pojo.User;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import javax.validation.constraints.Email;
@@ -66,4 +67,12 @@ public interface SysUserService extends IService<User> {
      * @return
      */
     Result reSendActiveMail(@Email(message = "邮箱格式错误") String username);
+
+    /**
+     * 查询用户列表
+     * @param userPage
+     * @param role
+     * @return
+     */
+    Result getUserList(Page<User> userPage, String role);
 }

@@ -52,7 +52,6 @@ public class MenuController {
      * @return
      */
     @GetMapping("/defaultMenu")
-    @PreAuthorize("isAnonymous()") //只允许匿名访问
     public Result getDefaultMenu() {
         ArrayList<Role> roles = new ArrayList<>();
         Role role = new Role();

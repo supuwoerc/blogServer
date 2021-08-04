@@ -50,14 +50,9 @@ public class User implements Serializable {
      */
     private int gender;
     /**
-     * 邮箱
-     */
-    private String email;
-    /**
      * 密码
      */
     private String password;
-
     /**
      * 状态 1正常 -1锁定
      */

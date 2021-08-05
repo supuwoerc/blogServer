@@ -1,16 +1,22 @@
 package cn.lookup.sanye.controller;
+
 import cn.lookup.sanye.common.vo.Result;
 import cn.lookup.sanye.pojo.Role;
 import cn.lookup.sanye.pojo.SysUserDetails;
 import cn.lookup.sanye.pojo.User;
+import cn.lookup.sanye.service.IUploadService;
 import cn.lookup.sanye.service.SysUserService;
+import cn.lookup.sanye.utils.FileUploadAndDownloadUtils;
+import cn.lookup.sanye.utils.MimeTypeEnum;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
+
 import javax.validation.constraints.Email;
 import java.util.List;
 import java.util.Map;
@@ -28,9 +34,12 @@ import java.util.Map;
 public class UserController {
     @Autowired
     private SysUserService sysUserService;
+    @Autowired
+    private IUploadService uploadService;
 
     /**
      * 获取当前登录人信息
+     *
      * @return
      */
     @GetMapping("/info")
@@ -48,6 +57,7 @@ public class UserController {
 
     /**
      * 获取当前登录人角色
+     *
      * @return
      */
     @GetMapping("/role")
@@ -65,6 +75,7 @@ public class UserController {
     /**
      * 需要管理员权限
      * 查询用户列表,可选参数用户角色role
+     *
      * @param role
      * @param page
      * @param size
@@ -72,14 +83,33 @@ public class UserController {
      */
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/userList")
-    public Result getUserList(@RequestParam(value = "role",required = false) String role,@RequestParam(value = "page",required = false,defaultValue = "1") long page,
-                              @RequestParam(value = "size",required = false,defaultValue = "10") long size,
-                              @RequestParam(value = "keyWord",required = false,defaultValue = "") String keyWord){
-        Page<User> userPage = new Page<>(page,size);
-        return sysUserService.getUserList(userPage,role,keyWord);
+    public Result getUserList(@RequestParam(value = "role", required = false) String role, @RequestParam(value = "page", required = false, defaultValue = "1") long page,
+                              @RequestParam(value = "size", required = false, defaultValue = "10") long size,
+                              @RequestParam(value = "keyWord", required = false, defaultValue = "") String keyWord) {
+        Page<User> userPage = new Page<>(page, size);
+        return sysUserService.getUserList(userPage, role, keyWord);
     }
+
+    /**
+     * 用户更换头像
+     *
+     * @param file
+     * @return
+     */
+    @PostMapping("/upload/avatar")
+    public Result uploadAvatar(MultipartFile file) {
+        try {
+            final MultipartFile[] multipartFiles = new MultipartFile[]{file};
+            final String[] result = uploadService.upload(multipartFiles,null,MimeTypeEnum.IMAGE_EXTENSION.getTypes(),"用户头像");
+            return Result.success(result[0]);
+        } catch (Exception e) {
+            return Result.fail(e.getMessage());
+        }
+    }
+
     /**
      * 激活账户
+     *
      * @param username
      * @param code
      * @param modelAndView
@@ -99,6 +129,7 @@ public class UserController {
 
     /**
      * 发送激活邮件到指定账户
+     *
      * @param username
      * @return
      */

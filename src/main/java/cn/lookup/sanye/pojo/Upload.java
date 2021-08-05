@@ -3,8 +3,10 @@ package cn.lookup.sanye.pojo;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+
 import java.time.LocalDateTime;
 import java.io.Serializable;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -35,12 +37,10 @@ public class Upload implements Serializable {
      * 本地存储位置
      */
     private String location;
-
     /**
-     * 业务名称
+     * 文件大小
      */
-    private String name;
-
+    private Long size;
     /**
      * 文件名
      */

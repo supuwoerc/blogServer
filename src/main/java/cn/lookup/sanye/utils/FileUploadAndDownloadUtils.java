@@ -5,15 +5,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import javax.servlet.http.HttpServletRequest;
+import java.io.*;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @Author: zhangqm<sanye>
@@ -37,14 +33,14 @@ public class FileUploadAndDownloadUtils {
     }
 
     /**
-     * 单个文件上传
+     * 单个文件上传到默认位置
      *
      * @param oneFile
      * @param allowedExtension
      * @return
      * @throws Exception
      */
-    public static String upload(MultipartFile oneFile, String[] allowedExtension) throws Exception {
+    public static String[] upload(MultipartFile oneFile, String[] allowedExtension) throws Exception {
         MultipartFile[] files = new MultipartFile[1];
         files[0] = oneFile;
         return upload(files, allowedExtension);
@@ -59,7 +55,7 @@ public class FileUploadAndDownloadUtils {
      * @return
      * @throws Exception
      */
-    public static String upload(String dir, MultipartFile oneFile, String[] allowedExtension) throws Exception {
+    public static String[] upload(String dir, MultipartFile oneFile, String[] allowedExtension) throws Exception {
         MultipartFile[] files = new MultipartFile[1];
         files[0] = oneFile;
         return upload(dir, files, allowedExtension);
@@ -73,7 +69,7 @@ public class FileUploadAndDownloadUtils {
      * @return
      * @throws Exception
      */
-    public static String upload(MultipartFile[] files, String[] allowedExtension) throws Exception {
+    public static String[] upload(MultipartFile[] files, String[] allowedExtension) throws Exception {
         return upload(FILE_DEFAULT_DIR, files, allowedExtension);
     }
 
@@ -85,7 +81,7 @@ public class FileUploadAndDownloadUtils {
      * @param allowedExtension 允许的后缀
      * @return 文件路径
      */
-    public static String upload(String dir, MultipartFile[] files, String[] allowedExtension) throws Exception {
+    public static String[] upload(String dir, MultipartFile[] files, String[] allowedExtension) throws Exception {
         assertAllowed(files, allowedExtension);
         ArrayList<String> fileNames = new ArrayList<>();
         for (MultipartFile file : files) {
@@ -94,7 +90,7 @@ public class FileUploadAndDownloadUtils {
             file.transferTo(absoluteFile);
             fileNames.add(absoluteFile.getAbsolutePath());
         }
-        return fileNames.toString();
+        return fileNames.toArray(new String[fileNames.size()]);
     }
 
     /**
@@ -130,6 +126,34 @@ public class FileUploadAndDownloadUtils {
     }
 
     /**
+     * 下载文件名重新编码
+     *
+     * @param request  请求对象
+     * @param fileName 文件名
+     * @return 编码后的文件名
+     */
+    public static String setFileDownloadHeader(HttpServletRequest request, String fileName)
+            throws UnsupportedEncodingException {
+        final String agent = request.getHeader("USER-AGENT");
+        String filename = fileName;
+        if (agent.contains("MSIE")) {
+            // IE浏览器
+            filename = URLEncoder.encode(filename, "utf-8");
+            filename = filename.replace("+", " ");
+        } else if (agent.contains("Firefox")) {
+            // 火狐浏览器
+            filename = new String(fileName.getBytes(), "ISO8859-1");
+        } else if (agent.contains("Chrome")) {
+            // google浏览器
+            filename = URLEncoder.encode(filename, "utf-8");
+        } else {
+            // 其它浏览器
+            filename = URLEncoder.encode(filename, "utf-8");
+        }
+        return filename;
+    }
+
+    /**
      * 删除文件
      *
      * @param filePath
@@ -152,7 +176,11 @@ public class FileUploadAndDownloadUtils {
      * @return
      */
     public static File getAbsoluteFile(String dir, String fileName) throws IOException {
-        File file = new File(dir + File.separator + fileName);
+        final Calendar instance = Calendar.getInstance();
+        final int year = instance.get(Calendar.YEAR);
+        final int month = instance.get(Calendar.MONTH) + 1;
+        final int date = instance.get(Calendar.DATE);
+        File file = new File(dir +File.separator+ year + File.separator + month + File.separator + date + File.separator + fileName);
         if (!file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
         }
@@ -170,7 +198,7 @@ public class FileUploadAndDownloadUtils {
      */
     public static String encodeFileName(MultipartFile file) {
         String uploadDate = simpleDateFormat.format(new Date());
-        return uploadDate + "_" + UUID.randomUUID().toString() + "." + getExtension(file);
+        return UUID.randomUUID().toString() + "." + getExtension(file);
     }
 
     /**

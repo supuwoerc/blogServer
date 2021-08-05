@@ -97,7 +97,7 @@ public class UserController {
      * @return
      */
     @PostMapping("/upload/avatar")
-    public Result uploadAvatar(MultipartFile file) {
+    public Result uploadAvatar(@RequestParam("file") MultipartFile file) {
         try {
             final MultipartFile[] multipartFiles = new MultipartFile[]{file};
             final String[] result = uploadService.upload(multipartFiles,null,MimeTypeEnum.IMAGE_EXTENSION.getTypes(),"用户头像");

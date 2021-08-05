@@ -1,6 +1,4 @@
 package cn.lookup.sanye.controller;
-
-
 import cn.lookup.sanye.common.vo.Result;
 import cn.lookup.sanye.pojo.Role;
 import cn.lookup.sanye.pojo.SysUserDetails;
@@ -13,9 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-
 import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Map;
 

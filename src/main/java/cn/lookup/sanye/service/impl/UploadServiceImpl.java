@@ -36,8 +36,7 @@ public class UploadServiceImpl extends ServiceImpl<UploadMapper, Upload> impleme
     @Override
     public String[] upload(MultipartFile[] files, String dir, String[] allowedExtension, String name) throws Exception {
         for (MultipartFile file : files) {
-            String fileName = file.getOriginalFilename();
-            if (fileName == null || "".equals(fileName)) {
+            if (file==null||file.getOriginalFilename() == null || "".equals(file.getOriginalFilename())) {
                 throw new Exception("上传文件为空");
             }
         }

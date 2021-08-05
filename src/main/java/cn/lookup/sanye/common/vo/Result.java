@@ -35,7 +35,7 @@ public class Result {
         return success(400,"操作失败",data);
     }
     public static Result fail(String msg,Object data){
-        return success(400,msg,data);
+        return fail(400,msg,data);
     }
     public static Result fail(int code,String msg,Object data){
         Result result = new Result();

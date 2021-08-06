@@ -1,8 +1,10 @@
 package cn.lookup.sanye.controller;
 
 import cn.lookup.sanye.common.vo.Result;
+import cn.lookup.sanye.common.vo.UploadFile;
 import cn.lookup.sanye.pojo.Role;
 import cn.lookup.sanye.pojo.SysUserDetails;
+import cn.lookup.sanye.pojo.Upload;
 import cn.lookup.sanye.pojo.User;
 import cn.lookup.sanye.service.IUploadService;
 import cn.lookup.sanye.service.SysUserService;
@@ -91,7 +93,7 @@ public class UserController {
     }
 
     /**
-     * 用户更换头像
+     * 用户上传头像
      *
      * @param file
      * @return
@@ -100,8 +102,8 @@ public class UserController {
     public Result uploadAvatar(@RequestParam("file") MultipartFile file) {
         try {
             final MultipartFile[] multipartFiles = new MultipartFile[]{file};
-            final String[] result = uploadService.upload(multipartFiles,null,MimeTypeEnum.IMAGE_EXTENSION.getTypes(),"用户头像");
-            return Result.success(result[0]);
+            final List<UploadFile> result = uploadService.upload(multipartFiles,null,MimeTypeEnum.IMAGE_EXTENSION.getTypes(),"用户头像");
+            return Result.success(result.get(0));
         } catch (Exception e) {
             return Result.fail(e.getMessage());
         }

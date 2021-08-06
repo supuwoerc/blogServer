@@ -1,14 +1,17 @@
 package cn.lookup.sanye.utils;
 
+import cn.lookup.sanye.common.vo.UploadFile;
+import cn.lookup.sanye.config.ProjectInfoBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -40,7 +43,7 @@ public class FileUploadAndDownloadUtils {
      * @return
      * @throws Exception
      */
-    public static String[] upload(MultipartFile oneFile, String[] allowedExtension) throws Exception {
+    public static List<UploadFile> upload(MultipartFile oneFile, String[] allowedExtension) throws Exception {
         MultipartFile[] files = new MultipartFile[1];
         files[0] = oneFile;
         return upload(files, allowedExtension);
@@ -55,7 +58,7 @@ public class FileUploadAndDownloadUtils {
      * @return
      * @throws Exception
      */
-    public static String[] upload(String dir, MultipartFile oneFile, String[] allowedExtension) throws Exception {
+    public static List<UploadFile> upload(String dir, MultipartFile oneFile, String[] allowedExtension) throws Exception {
         MultipartFile[] files = new MultipartFile[1];
         files[0] = oneFile;
         return upload(dir, files, allowedExtension);
@@ -69,7 +72,7 @@ public class FileUploadAndDownloadUtils {
      * @return
      * @throws Exception
      */
-    public static String[] upload(MultipartFile[] files, String[] allowedExtension) throws Exception {
+    public static List<UploadFile> upload(MultipartFile[] files, String[] allowedExtension) throws Exception {
         return upload(FILE_DEFAULT_DIR, files, allowedExtension);
     }
 
@@ -81,16 +84,25 @@ public class FileUploadAndDownloadUtils {
      * @param allowedExtension 允许的后缀
      * @return 文件路径
      */
-    public static String[] upload(String dir, MultipartFile[] files, String[] allowedExtension) throws Exception {
+    public static List<UploadFile> upload(String dir, MultipartFile[] files, String[] allowedExtension) throws Exception {
         assertAllowed(files, allowedExtension);
-        ArrayList<String> fileNames = new ArrayList<>();
+        ArrayList<UploadFile> uploadList = new ArrayList<>();
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         for (MultipartFile file : files) {
             String fileName = encodeFileName(file);
-            File absoluteFile = getAbsoluteFile(dir, fileName);
+            final Calendar instance = Calendar.getInstance();
+            File absoluteFile = getAbsoluteFile(dir, instance, fileName);
             file.transferTo(absoluteFile);
-            fileNames.add(absoluteFile.getAbsolutePath());
+            UploadFile uploadFile = new UploadFile();
+            uploadFile.setSize(file.getSize());
+            uploadFile.setCreate_time(dateTimeFormatter.format(LocalDateTime.now()));
+            uploadFile.setName(fileName);
+            uploadFile.setSource_name(file.getOriginalFilename());
+            uploadFile.setLocation(absoluteFile.getAbsolutePath());
+            uploadFile.setUrl(getFileUrl(instance, fileName));
+            uploadList.add(uploadFile);
         }
-        return fileNames.toArray(new String[fileNames.size()]);
+        return uploadList;
     }
 
     /**
@@ -175,12 +187,11 @@ public class FileUploadAndDownloadUtils {
      * @param fileName
      * @return
      */
-    public static File getAbsoluteFile(String dir, String fileName) throws IOException {
-        final Calendar instance = Calendar.getInstance();
+    public static File getAbsoluteFile(String dir, Calendar instance, String fileName) throws IOException {
         final int year = instance.get(Calendar.YEAR);
         final int month = instance.get(Calendar.MONTH) + 1;
         final int date = instance.get(Calendar.DATE);
-        File file = new File(dir +File.separator+ year + File.separator + month + File.separator + date + File.separator + fileName);
+        File file = new File(dir + File.separator + year + File.separator + month + File.separator + date + File.separator + fileName);
         if (!file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
         }
@@ -188,6 +199,20 @@ public class FileUploadAndDownloadUtils {
             file.createNewFile();
         }
         return file;
+    }
+
+    /**
+     * 返回访问图片路径(配合图片映射)
+     *
+     * @param instance
+     * @param fileName
+     * @return
+     */
+    public static String getFileUrl(Calendar instance, String fileName) {
+        final int year = instance.get(Calendar.YEAR);
+        final int month = instance.get(Calendar.MONTH) + 1;
+        final int date = instance.get(Calendar.DATE);
+        return ProjectInfoBean.getServerUrl() + "/upload-images/" + year + "/" + month + "/" + date + "/" + fileName;
     }
 
     /**

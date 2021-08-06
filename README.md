@@ -31,3 +31,20 @@
   * https://github.com/spring-projects/spring-security/issues/6908
   * https://stackoverflow.com/questions/31074040/custom-accessdeniedhandler-not-called
 * RBAC的权限设计的疑惑：原本设计RBAC的五张表，想着将权限表当做菜单表实现动态菜单，也就是权限是菜单的体现，角色是权限的集合，人是角色的集合，但是实际上是不适合的，因为在token未过期的情况下，后台想要限制某一个角色的权限，只能依靠用户重新登录来刷新菜单来实现，这点是不恰当的，所以最优解是降低访问的权限粒度，将权限和菜单分开，即使用户存在这个菜单，因为不知道菜单是何时请求的产物，也需要验证权限。
+* 图片上传到服务器上的预览问题
+  * 搭建Nginx图片服务器
+  * Springboot搭建图片服务器中继承`WebMvcConfigurationSupport`重写`addResourceHandlers`导致其他静态资源，例如Swagger2的页面访问不了，static路径也访问不到，原因其实就是当我们使用WebMvcConfigurationSupport时WebMvc自动化配置就会失效
+    * 解决法1：最简单的解决办法就是将：`extends WebMvcConfigurationSupport`替换为`implements WebMvcConfigure`
+    * 解决法2：
+    ```
+    @Override
+        public void addResourceHandlers(ResourceHandlerRegistry registry) {
+            //重写这个方法，映射静态资源文件
+            registry.addResourceHandler("/**")
+                    .addResourceLocations("classpath:/resources/")
+                    .addResourceLocations("classpath:/static/")
+                    .addResourceLocations("classpath:/public/");
+            super.addResourceHandlers(registry);
+        }
+    ```
+  

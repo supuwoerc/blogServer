@@ -1,8 +1,11 @@
 package cn.lookup.sanye.service;
 
+import cn.lookup.sanye.common.vo.UploadFile;
 import cn.lookup.sanye.pojo.Upload;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 /**
  * <p>
@@ -19,5 +22,5 @@ public interface IUploadService extends IService<Upload> {
      * @param dir
      * @return
      */
-    String[] upload(MultipartFile[] files,String dir,String[] allowedExtension,String name) throws Exception;
+    List<UploadFile> upload(MultipartFile[] files, String dir, String[] allowedExtension, String name) throws Exception;
 }

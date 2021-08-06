@@ -1,17 +1,15 @@
 package cn.lookup.sanye.service.impl;
 
+import cn.lookup.sanye.common.vo.UploadFile;
 import cn.lookup.sanye.pojo.Upload;
 import cn.lookup.sanye.mapper.UploadMapper;
 import cn.lookup.sanye.service.IUploadService;
 import cn.lookup.sanye.utils.FileUploadAndDownloadUtils;
-import cn.lookup.sanye.utils.MimeTypeEnum;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.time.LocalDateTime;
-import java.util.Date;
+import java.util.List;
 
 /**
  * <p>
@@ -34,13 +32,13 @@ public class UploadServiceImpl extends ServiceImpl<UploadMapper, Upload> impleme
      * @throws Exception
      */
     @Override
-    public String[] upload(MultipartFile[] files, String dir, String[] allowedExtension, String name) throws Exception {
+    public List<UploadFile> upload(MultipartFile[] files, String dir, String[] allowedExtension, String name) throws Exception {
         for (MultipartFile file : files) {
             if (file==null||file.getOriginalFilename() == null || "".equals(file.getOriginalFilename())) {
                 throw new Exception("上传文件为空");
             }
         }
-        String[] uploadResult = null;
+        List<UploadFile> uploadResult = null;
         if (dir == null) {
             uploadResult = FileUploadAndDownloadUtils.upload(files, allowedExtension);
         } else {
@@ -49,7 +47,7 @@ public class UploadServiceImpl extends ServiceImpl<UploadMapper, Upload> impleme
         for (int i = 0; i < files.length; i++) {
             Upload uploadFile = new Upload();
             uploadFile.setDescription(name);
-            uploadFile.setLocation(uploadResult[i]);
+            uploadFile.setLocation(uploadResult.get(i).getLocation());
             uploadFile.setOld_name(files[i].getOriginalFilename());
             uploadFile.setCreate_time(LocalDateTime.now());
             uploadFile.setUpdate_time(LocalDateTime.now());

@@ -1,7 +1,6 @@
 package cn.lookup.sanye.utils;
 
 import cn.lookup.sanye.common.vo.UploadFile;
-import cn.lookup.sanye.config.ProjectInfoBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -212,7 +211,7 @@ public class FileUploadAndDownloadUtils {
         final int year = instance.get(Calendar.YEAR);
         final int month = instance.get(Calendar.MONTH) + 1;
         final int date = instance.get(Calendar.DATE);
-        return ProjectInfoBean.getServerUrl() + "/upload-images/" + year + "/" + month + "/" + date + "/" + fileName;
+        return "/upload-images/" + year + "/" + month + "/" + date + "/" + fileName;
     }
 
     /**

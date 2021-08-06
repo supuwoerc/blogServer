@@ -11,7 +11,9 @@ import cn.lookup.sanye.service.SysUserService;
 import cn.lookup.sanye.utils.FileUploadAndDownloadUtils;
 import cn.lookup.sanye.utils.MimeTypeEnum;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -102,10 +104,28 @@ public class UserController {
     public Result uploadAvatar(@RequestParam("file") MultipartFile file) {
         try {
             final MultipartFile[] multipartFiles = new MultipartFile[]{file};
-            final List<UploadFile> result = uploadService.upload(multipartFiles,null,MimeTypeEnum.IMAGE_EXTENSION.getTypes(),"用户头像");
+            final List<UploadFile> result = uploadService.upload(multipartFiles, null, MimeTypeEnum.IMAGE_EXTENSION.getTypes(), "用户头像");
             return Result.success(result.get(0));
         } catch (Exception e) {
             return Result.fail(e.getMessage());
+        }
+    }
+
+    /**
+     * 更新当前用户信息
+     * @param userDto
+     * @return
+     */
+    @PostMapping("/updateUserInfo")
+    public Result updateUserInfo(@RequestBody User userDto) {
+        //获取当前上下文中的用户
+        try {
+            SysUserDetails sysUserDetails = (SysUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            User user = sysUserService.getOne(new QueryWrapper<User>().lambda().eq(User::getUsername, sysUserDetails.getUsername()));
+            sysUserService.update(userDto, new UpdateWrapper<User>().lambda().eq(User::getId, user.getId()));
+            return Result.success("更新成功");
+        } catch (Exception e) {
+            return Result.fail("更新失败", e.getMessage());
         }
     }
 

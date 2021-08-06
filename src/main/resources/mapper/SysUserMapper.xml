@@ -39,9 +39,6 @@
 	<!-- 查询用户列表(可以根据角色查找对应列表映射结果 -->
 	<resultMap id="getUserListMap" type="cn.lookup.sanye.pojo.User">
 		<id column="id" property="id" />
-		<result column="nickname" property="nickname" />
-		<result column="avatar" property="avatar"/>
-		<result column="status" property="status"/>
 		<collection property="roleList" select="getUserRoleByUserId" column="id" ofType="cn.lookup.sanye.pojo.Role">
 		</collection>
 	</resultMap>
@@ -49,7 +46,7 @@
 	<select id="getUserList" resultMap="getUserListMap" parameterType="String">
 		SELECT
 		distinct
-		u.*
+		u.id,u.avatar,u.gender,u.nickname,u.status,u.username
 		FROM
 		sys_user u
 		LEFT JOIN sys_user_role ur

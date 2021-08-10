@@ -6,6 +6,7 @@ import cn.lookup.sanye.service.SysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class RegisterController {
     @Autowired
     SysUserService sysUserService;
-    @PostMapping("/register")
+    @PutMapping("/register")
     public Result register(@RequestBody @Validated LoginAndRegisterUserDto registerUserDto){
         return sysUserService.register(registerUserDto.getUsername(),registerUserDto.getPassword(),registerUserDto.getCodeKey(),registerUserDto.getCode());
     }

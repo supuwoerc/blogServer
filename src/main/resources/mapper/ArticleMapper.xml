@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.lookup.sanye.mapper.ArticleMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.lookup.sanye.pojo.Article">
+        <id column="id" property="id" />
+        <result column="title" property="title" />
+        <result column="content" property="content" />
+        <result column="like_num" property="like_num" />
+        <result column="view_num" property="view_num" />
+        <result column="update_time" property="update_time" />
+        <result column="create_time" property="create_time" />
+        <result column="create_user" property="create_user" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, title, content, like_num, view_num, update_time, create_time, create_user
+    </sql>
+
+</mapper>

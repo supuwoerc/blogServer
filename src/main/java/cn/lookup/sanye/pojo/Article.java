@@ -40,7 +40,10 @@ public class Article implements Serializable {
      * 文章详情
      */
     private String content;
-
+    /**
+     * 文章封面
+     */
+    private String cover_url;
     /**
      * 点赞数(redis同步)
      */

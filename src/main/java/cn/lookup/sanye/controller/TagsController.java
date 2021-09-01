@@ -46,7 +46,7 @@ public class TagsController {
     }
 
     /**
-     * 新增标签(每个账户最多15个标签)
+     * 保存标签(每个账户最多15个标签)
      *
      * @param tags
      * @return

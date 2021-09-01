@@ -103,8 +103,9 @@ public class UserController {
     @PostMapping("/upload/avatar")
     public Result uploadAvatar(@RequestParam("file") MultipartFile file) {
         try {
+            SysUserDetails sysUserDetails = (SysUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             final MultipartFile[] multipartFiles = new MultipartFile[]{file};
-            final List<UploadFile> result = uploadService.upload(multipartFiles, null, MimeTypeEnum.IMAGE_EXTENSION.getTypes(), "用户头像");
+            final List<UploadFile> result = uploadService.upload(sysUserDetails.getId(),multipartFiles, null, MimeTypeEnum.IMAGE_EXTENSION.getTypes(), "用户头像");
             return Result.success(result.get(0));
         } catch (Exception e) {
             return Result.fail(e.getMessage());

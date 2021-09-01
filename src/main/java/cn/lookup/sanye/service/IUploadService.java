@@ -18,9 +18,20 @@ import java.util.List;
 public interface IUploadService extends IService<Upload> {
     /**
      * 上传文件
-     * @param files
-     * @param dir
+     * @param uid 用户id
+     * @param files 文件集合
+     * @param dir 上传目录
+     * @param allowedExtension 扩展名枚举
+     * @param name 上传动作,如：用户头像
+     * @return
+     * @throws Exception
+     */
+    List<UploadFile> upload(Long uid,MultipartFile[] files, String dir, String[] allowedExtension, String name) throws Exception;
+
+    /**
+     * 删除数据库文件上传的记录(文件不会删除，文件的删除依赖定时任务)
+     * @param ids
      * @return
      */
-    List<UploadFile> upload(MultipartFile[] files, String dir, String[] allowedExtension, String name) throws Exception;
+    boolean delete(Long[] ids);
 }

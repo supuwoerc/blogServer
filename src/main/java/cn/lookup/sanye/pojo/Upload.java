@@ -32,7 +32,10 @@ public class Upload implements Serializable {
      */
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
-
+    /**
+     * 上传者用户id
+     */
+    private Long uid;
     /**
      * 本地存储位置
      */

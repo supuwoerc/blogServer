@@ -12,6 +12,10 @@ import java.time.LocalDateTime;
 @Data
 public class UploadFile{
     /**
+     * 数据库中存储的主键id
+     */
+    private Long id;
+    /**
      * 本地存储位置
      */
     private String location;
@@ -28,7 +32,7 @@ public class UploadFile{
      */
     private String source_name;
     /**
-     * 存储文件名
+     * 存储的唯一文件名
      */
     private String name;
     /**

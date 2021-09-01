@@ -8,7 +8,10 @@ import cn.lookup.sanye.utils.FileUploadAndDownloadUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -32,9 +35,9 @@ public class UploadServiceImpl extends ServiceImpl<UploadMapper, Upload> impleme
      * @throws Exception
      */
     @Override
-    public List<UploadFile> upload(MultipartFile[] files, String dir, String[] allowedExtension, String name) throws Exception {
+    public List<UploadFile> upload(Long uid, MultipartFile[] files, String dir, String[] allowedExtension, String name) throws Exception {
         for (MultipartFile file : files) {
-            if (file==null||file.getOriginalFilename() == null || "".equals(file.getOriginalFilename())) {
+            if (file == null || file.getOriginalFilename() == null || "".equals(file.getOriginalFilename())) {
                 throw new Exception("上传文件为空");
             }
         }
@@ -44,16 +47,33 @@ public class UploadServiceImpl extends ServiceImpl<UploadMapper, Upload> impleme
         } else {
             uploadResult = FileUploadAndDownloadUtils.upload(dir, files, allowedExtension);
         }
+        ArrayList<Upload> batch = new ArrayList<>();
         for (int i = 0; i < files.length; i++) {
             Upload uploadFile = new Upload();
+            uploadFile.setUid(uid);
             uploadFile.setDescription(name);
             uploadFile.setLocation(uploadResult.get(i).getLocation());
             uploadFile.setOld_name(files[i].getOriginalFilename());
             uploadFile.setCreate_time(LocalDateTime.now());
             uploadFile.setUpdate_time(LocalDateTime.now());
             uploadFile.setSize(files[i].getSize());
-            this.baseMapper.insert(uploadFile);
+            batch.add(uploadFile);
+        }
+        this.saveBatch(batch); //批量添加数据库记录
+        for (int i = 0; i < uploadResult.size(); i++) {
+            uploadResult.get(i).setId(batch.get(i).getId());
         }
         return uploadResult;
+    }
+
+    /**
+     * 删除数据库文件上传的记录(文件不会删除，文件的删除依赖定时任务)
+     * @param ids
+     * @return
+     */
+    @Override
+    public boolean delete(Long[] ids) {
+        this.baseMapper.deleteBatchIds(Arrays.asList(ids));
+        return true;
     }
 }

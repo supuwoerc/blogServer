@@ -60,9 +60,14 @@ public class ArticleController {
         try {
             SysUserDetails sysUserDetails = (SysUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             Upload one = uploadService.getOne(new QueryWrapper<Upload>().eq("id", id).eq("uid", sysUserDetails.getId()));
+            if (one == null) {
+                throw new Exception("用户无删除权限");
+            }
             boolean deleteResult = uploadService.delete(new Long[]{one.getId()});
-            String s = deleteResult ? "删除成功" : "删除失败";
-            return Result.success(s);
+            if (!deleteResult) {
+                throw new Exception("删除失败");
+            }
+            return Result.success("删除成功");
         } catch (Exception e) {
             e.printStackTrace();
             return Result.fail(e.getMessage());

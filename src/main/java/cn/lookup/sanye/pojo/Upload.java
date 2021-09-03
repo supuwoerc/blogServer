@@ -37,6 +37,10 @@ public class Upload implements Serializable {
      */
     private Long uid;
     /**
+     * 可用状态
+     */
+    private int active;
+    /**
      * 本地存储位置
      */
     private String location;

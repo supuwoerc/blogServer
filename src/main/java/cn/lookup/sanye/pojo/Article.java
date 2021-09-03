@@ -9,6 +9,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
 /**
  * <p>
  * 
@@ -34,6 +37,8 @@ public class Article implements Serializable {
     /**
      * 文章标题
      */
+    @NotBlank(message = "标题不能为空")
+    @Size(message = "标题长度需要在1-20之间",min = 1,max = 20)
     private String title;
 
     /**

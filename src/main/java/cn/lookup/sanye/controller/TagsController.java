@@ -2,6 +2,7 @@ package cn.lookup.sanye.controller;
 
 
 import cn.lookup.sanye.common.vo.Result;
+import cn.lookup.sanye.exception.BadRequestException;
 import cn.lookup.sanye.pojo.SysUserDetails;
 import cn.lookup.sanye.pojo.Tags;
 import cn.lookup.sanye.pojo.User;
@@ -36,13 +37,9 @@ public class TagsController {
      */
     @GetMapping("/list")
     public Result getTags() {
-        try {
-            SysUserDetails sysUserDetails = (SysUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            List<Tags> list = tagsService.list(new QueryWrapper<Tags>().eq("create_user", sysUserDetails.getId()).orderByAsc("sort"));
-            return Result.success(list);
-        } catch (Exception e) {
-            return Result.fail("登录过期", null);
-        }
+        SysUserDetails sysUserDetails = (SysUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        List<Tags> list = tagsService.list(new QueryWrapper<Tags>().eq("create_user", sysUserDetails.getId()).orderByAsc("sort"));
+        return Result.success(list);
     }
 
     /**
@@ -53,40 +50,30 @@ public class TagsController {
      */
     @PostMapping("/save")
     public Result saveTags(@Validated @RequestBody Tags[] tags) {
-        try {
-            SysUserDetails sysUserDetails = (SysUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            List<Tags> list = tagsService.list(new QueryWrapper<Tags>().eq("create_user", sysUserDetails.getId()));
-            Result result = null;
-            if (list.size() >= 15) {
-                result = Result.fail("标签数量大于15", null);
-            } else {
-                for (int i = 0; i < tags.length; i++) {
-                    tags[i].setCreate_user(sysUserDetails.getId());
-                    tags[i].setSort((long) i);
-                }
-                boolean saveSuccess = tagsService.saveOrUpdateBatch(Arrays.asList(tags));
-                result = saveSuccess ? Result.success("保存成功", null) : Result.fail("保存失败", null);
+        SysUserDetails sysUserDetails = (SysUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        List<Tags> list = tagsService.list(new QueryWrapper<Tags>().eq("create_user", sysUserDetails.getId()));
+        if (list.size() >= 15) {
+            throw new BadRequestException(500, "标签数量大于15");
+        } else {
+            for (int i = 0; i < tags.length; i++) {
+                tags[i].setCreate_user(sysUserDetails.getId());
+                tags[i].setSort((long) i);
             }
-            return result;
-        } catch (Exception e) {
-            return Result.fail("登录过期", null);
+            tagsService.saveOrUpdateBatch(Arrays.asList(tags));
         }
+        return Result.success("保存成功", null);
     }
 
     /**
      * 删除标签
+     *
      * @param tag
      * @return
      */
     @DeleteMapping("/delete")
     public Result deleteTag(@RequestBody Tags tag) {
-        try {
-            SysUserDetails sysUserDetails = (SysUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            boolean removeResult = tagsService.remove(new QueryWrapper<Tags>().eq("create_user", sysUserDetails.getId()).eq("id", tag.getId()));
-            Result result = removeResult ? Result.success("删除成功", null) : Result.fail("删除失败", null);
-            return result;
-        } catch (Exception e) {
-            return Result.fail("登录过期", null);
-        }
+        SysUserDetails sysUserDetails = (SysUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        tagsService.remove(new QueryWrapper<Tags>().eq("create_user", sysUserDetails.getId()).eq("id", tag.getId()));
+        return Result.success("删除成功", null);
     }
 }

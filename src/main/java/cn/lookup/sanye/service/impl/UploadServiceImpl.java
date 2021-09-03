@@ -11,7 +11,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -67,13 +66,20 @@ public class UploadServiceImpl extends ServiceImpl<UploadMapper, Upload> impleme
     }
 
     /**
-     * 删除数据库文件上传的记录(文件不会删除，文件的删除依赖定时任务)
+     * 更新数据库文件上传的记录为失活(文件不会删除，文件的删除依赖定时任务)
+     *
      * @param ids
      * @return
      */
     @Override
-    public boolean delete(Long[] ids) {
-        this.baseMapper.deleteBatchIds(Arrays.asList(ids));
-        return true;
+    public void delete(Long[] ids) {
+        ArrayList<Upload> uploads = new ArrayList<>();
+        for (Long id : ids) {
+            Upload item = new Upload();
+            item.setId(id);
+            item.setActive(0);
+            uploads.add(item);
+        }
+        this.updateBatchById(uploads);
     }
 }

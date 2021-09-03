@@ -3,6 +3,7 @@ package cn.lookup.sanye;
 import cn.lookup.sanye.config.ProjectInfoBean;
 import cn.lookup.sanye.mapper.SysUserMapper;
 import cn.lookup.sanye.mapper.UserMapper;
+import cn.lookup.sanye.service.IUploadService;
 import cn.lookup.sanye.service.MailService;
 import cn.lookup.sanye.service.SysUserService;
 import org.junit.jupiter.api.Test;
@@ -18,6 +19,8 @@ class SanyeApplicationTests {
     private MailService mailService;
     @Autowired
     private SysUserService sysUserService;
+    @Autowired
+    private IUploadService uploadService;
 
     @Test
     void contextLoads() {
@@ -42,5 +45,10 @@ class SanyeApplicationTests {
         String name = "1.";
         System.out.println(name.lastIndexOf("."));
         System.out.println(name.substring(name.lastIndexOf(".") + 1));
+    }
+
+    @Test
+    void activeUpload() {
+        uploadService.delete(new Long[]{1L, 2L});
     }
 }

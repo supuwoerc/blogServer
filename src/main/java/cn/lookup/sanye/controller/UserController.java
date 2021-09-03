@@ -2,18 +2,18 @@ package cn.lookup.sanye.controller;
 
 import cn.lookup.sanye.common.vo.Result;
 import cn.lookup.sanye.common.vo.UploadFile;
+import cn.lookup.sanye.exception.BadRequestException;
 import cn.lookup.sanye.pojo.Role;
 import cn.lookup.sanye.pojo.SysUserDetails;
 import cn.lookup.sanye.pojo.Upload;
 import cn.lookup.sanye.pojo.User;
 import cn.lookup.sanye.service.IUploadService;
 import cn.lookup.sanye.service.SysUserService;
-import cn.lookup.sanye.utils.FileUploadAndDownloadUtils;
 import cn.lookup.sanye.utils.MimeTypeEnum;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -49,14 +49,10 @@ public class UserController {
     @GetMapping("/info")
     public Result getUserInfo() {
         //获取当前上下文中的用户
-        try {
-            SysUserDetails sysUserDetails = (SysUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            User user = sysUserService.getOne(new QueryWrapper<User>().lambda().eq(User::getUsername, sysUserDetails.getUsername()));
-            user.setPassword(null);
-            return Result.success(user);
-        } catch (Exception e) {
-            return Result.fail("登录过期", null);
-        }
+        SysUserDetails sysUserDetails = (SysUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = sysUserService.getOne(new QueryWrapper<User>().lambda().eq(User::getUsername, sysUserDetails.getUsername()));
+        user.setPassword(null);
+        return Result.success(user);
     }
 
     /**
@@ -67,13 +63,9 @@ public class UserController {
     @GetMapping("/role")
     public Result getUserRole() {
         //获取当前上下文中的用户
-        try {
-            SysUserDetails sysUserDetails = (SysUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            List<Role> roles = sysUserService.findRolesByUserName(sysUserDetails.getUsername());
-            return Result.success(roles);
-        } catch (Exception e) {
-            return Result.fail("登录过期", null);
-        }
+        SysUserDetails sysUserDetails = (SysUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        List<Role> roles = sysUserService.findRolesByUserName(sysUserDetails.getUsername());
+        return Result.success(roles);
     }
 
     /**
@@ -91,7 +83,8 @@ public class UserController {
                               @RequestParam(value = "size", required = false, defaultValue = "10") long size,
                               @RequestParam(value = "keyWord", required = false, defaultValue = "") String keyWord) {
         Page<User> userPage = new Page<>(page, size);
-        return sysUserService.getUserList(userPage, role, keyWord);
+        IPage<User> userList = sysUserService.getUserList(userPage, role, keyWord);
+        return Result.success(userList);
     }
 
     /**
@@ -101,33 +94,25 @@ public class UserController {
      * @return
      */
     @PostMapping("/upload/avatar")
-    public Result uploadAvatar(@RequestParam("file") MultipartFile file) {
-        try {
-            SysUserDetails sysUserDetails = (SysUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            final MultipartFile[] multipartFiles = new MultipartFile[]{file};
-            final List<UploadFile> result = uploadService.upload(sysUserDetails.getId(),multipartFiles, null, MimeTypeEnum.IMAGE_EXTENSION.getTypes(), "用户头像");
-            return Result.success(result.get(0));
-        } catch (Exception e) {
-            return Result.fail(e.getMessage());
-        }
+    public Result uploadAvatar(@RequestParam("file") MultipartFile file) throws Exception {
+        SysUserDetails sysUserDetails = (SysUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UploadFile uploadFile = sysUserService.updateAvatar(file, sysUserDetails.getId());
+        return Result.success(uploadFile);
     }
 
     /**
      * 更新当前用户信息
+     *
      * @param userDto
      * @return
      */
     @PostMapping("/updateUserInfo")
     public Result updateUserInfo(@RequestBody User userDto) {
         //获取当前上下文中的用户
-        try {
-            SysUserDetails sysUserDetails = (SysUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            User user = sysUserService.getOne(new QueryWrapper<User>().lambda().eq(User::getUsername, sysUserDetails.getUsername()));
-            sysUserService.update(userDto, new UpdateWrapper<User>().lambda().eq(User::getId, user.getId()));
-            return Result.success("更新成功");
-        } catch (Exception e) {
-            return Result.fail("更新失败", e.getMessage());
-        }
+        SysUserDetails sysUserDetails = (SysUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = sysUserService.getOne(new QueryWrapper<User>().lambda().eq(User::getUsername, sysUserDetails.getUsername()));
+        sysUserService.update(userDto, new UpdateWrapper<User>().lambda().eq(User::getId, user.getId()));
+        return Result.success("更新成功");
     }
 
     /**
@@ -140,8 +125,6 @@ public class UserController {
      */
     @GetMapping("/activeUser/{username}/{activeCode}")
     public ModelAndView activeUser(@PathVariable("username") String username, @PathVariable("activeCode") String code, ModelAndView modelAndView) {
-        System.out.println(username);
-        System.out.println(code);
         Map<String, Object> result = sysUserService.activeUser(username, code);
         modelAndView.setViewName("activeUserResult");
         modelAndView.addObject("msg", result.get("msg"));
@@ -158,6 +141,7 @@ public class UserController {
      */
     @PostMapping("/reActiveUser/{username}")
     public Result reSendMail(@Email(message = "邮箱格式错误") @PathVariable("username") String username) {
-        return sysUserService.reSendActiveMail(username);
+        sysUserService.reSendActiveMail(username);
+        return Result.success("发送成功");
     }
 }

@@ -29,9 +29,9 @@ public interface IUploadService extends IService<Upload> {
     List<UploadFile> upload(Long uid,MultipartFile[] files, String dir, String[] allowedExtension, String name) throws Exception;
 
     /**
-     * 删除数据库文件上传的记录(文件不会删除，文件的删除依赖定时任务)
+     * 更新数据库文件上传的记录为失活(文件不会删除，文件的删除依赖定时任务)
      * @param ids
      * @return
      */
-    boolean delete(Long[] ids);
+    void delete(Long[] ids);
 }

@@ -19,8 +19,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class RegisterController {
     @Autowired
     SysUserService sysUserService;
+
     @PutMapping("/register")
-    public Result register(@RequestBody @Validated LoginAndRegisterUserDto registerUserDto){
-        return sysUserService.register(registerUserDto.getUsername(),registerUserDto.getPassword(),registerUserDto.getCodeKey(),registerUserDto.getCode());
+    public Result register(@RequestBody @Validated LoginAndRegisterUserDto registerUserDto) throws Exception {
+        sysUserService.register(registerUserDto.getUsername(), registerUserDto.getPassword(), registerUserDto.getCodeKey(), registerUserDto.getCode());
+        return Result.success("注册成功");
     }
 }

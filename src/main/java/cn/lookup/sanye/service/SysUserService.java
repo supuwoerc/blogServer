@@ -1,11 +1,14 @@
 package cn.lookup.sanye.service;
 
 import cn.lookup.sanye.common.vo.Result;
+import cn.lookup.sanye.common.vo.UploadFile;
 import cn.lookup.sanye.pojo.Auth;
 import cn.lookup.sanye.pojo.Role;
 import cn.lookup.sanye.pojo.User;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.Email;
 import java.util.List;
@@ -51,7 +54,7 @@ public interface SysUserService extends IService<User> {
      * @param code  验证码
      * @return
      */
-    Result register(String username, String password, String codeKey, String code);
+    void register(String username, String password, String codeKey, String code) throws Exception;
 
     /**
      * 邮件激活账户
@@ -66,7 +69,7 @@ public interface SysUserService extends IService<User> {
      * @param username
      * @return
      */
-    Result reSendActiveMail(@Email(message = "邮箱格式错误") String username);
+    void reSendActiveMail(@Email(message = "邮箱格式错误") String username);
 
     /**
      * 查询用户列表
@@ -74,5 +77,13 @@ public interface SysUserService extends IService<User> {
      * @param role
      * @return
      */
-    Result getUserList(Page<User> userPage, String role,String keyWord);
+    IPage<User> getUserList(Page<User> userPage, String role, String keyWord);
+
+    /**
+     * 更新用户头像
+     * @param file
+     * @param uid
+     * @return
+     */
+    UploadFile updateAvatar(MultipartFile file, Long uid) throws Exception;
 }

@@ -3,6 +3,7 @@ package cn.lookup.sanye.controller;
 
 import cn.lookup.sanye.common.vo.Result;
 import cn.lookup.sanye.common.vo.UploadFile;
+import cn.lookup.sanye.exception.BadRequestException;
 import cn.lookup.sanye.pojo.SysUserDetails;
 import cn.lookup.sanye.pojo.Upload;
 import cn.lookup.sanye.service.IUploadService;
@@ -37,16 +38,11 @@ public class ArticleController {
      * @return
      */
     @PostMapping("/upload/cover")
-    public Result uploadCoverImg(@RequestParam("file") MultipartFile file) {
-        try {
-            SysUserDetails sysUserDetails = (SysUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            final MultipartFile[] multipartFiles = new MultipartFile[]{file};
-            final List<UploadFile> result = uploadService.upload(sysUserDetails.getId(), multipartFiles, null, MimeTypeEnum.IMAGE_EXTENSION.getTypes(), "文章封面");
-            return Result.success(result.get(0));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Result.fail(e.getMessage());
-        }
+    public Result uploadCoverImg(@RequestParam("file") MultipartFile file) throws Exception {
+        SysUserDetails sysUserDetails = (SysUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        final MultipartFile[] multipartFiles = new MultipartFile[]{file};
+        final List<UploadFile> result = uploadService.upload(sysUserDetails.getId(), multipartFiles, null, MimeTypeEnum.IMAGE_EXTENSION.getTypes(), "文章封面");
+        return Result.success(result.get(0));
     }
 
     /**
@@ -57,20 +53,16 @@ public class ArticleController {
      */
     @DeleteMapping("/delete/cover/{coverId}")
     public Result deleteCoverImg(@PathVariable("coverId") Long id) {
-        try {
-            SysUserDetails sysUserDetails = (SysUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            Upload one = uploadService.getOne(new QueryWrapper<Upload>().eq("id", id).eq("uid", sysUserDetails.getId()));
-            if (one == null) {
-                throw new Exception("用户无删除权限");
-            }
-            boolean deleteResult = uploadService.delete(new Long[]{one.getId()});
-            if (!deleteResult) {
-                throw new Exception("删除失败");
-            }
-            return Result.success("删除成功");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Result.fail(e.getMessage());
+        SysUserDetails sysUserDetails = (SysUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Upload one = uploadService.getOne(new QueryWrapper<Upload>().eq("id", id).eq("uid", sysUserDetails.getId()));
+        if (one == null) {
+            throw new BadRequestException(500, "未找到上传文件");
         }
+        uploadService.delete(new Long[]{one.getId()});
+        return Result.success("删除成功");
+    }
+    @PutMapping("/save")
+    public Result saveArticle(){
+        return Result.success("保存成功");
     }
 }

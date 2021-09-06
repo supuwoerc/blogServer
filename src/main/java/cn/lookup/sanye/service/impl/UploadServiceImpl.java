@@ -78,8 +78,29 @@ public class UploadServiceImpl extends ServiceImpl<UploadMapper, Upload> impleme
             Upload item = new Upload();
             item.setId(id);
             item.setActive(0);
+            item.setUpdate_time(LocalDateTime.now());
             uploads.add(item);
         }
         this.updateBatchById(uploads);
+    }
+
+    /**
+     * 更新数据库文件上传的记录为失活(文件不会删除，文件的删除依赖定时任务)
+     *
+     * @param names upload的文件名集合
+     */
+    @Override
+    public void delete(String[] names) {
+        this.delete(names);
+    }
+
+    /**
+     * 激活文件
+     *
+     * @param ids
+     */
+    @Override
+    public void active(Long[] ids) {
+        this.active(ids);
     }
 }

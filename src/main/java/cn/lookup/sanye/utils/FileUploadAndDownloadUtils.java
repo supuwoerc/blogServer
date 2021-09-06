@@ -261,5 +261,16 @@ public class FileUploadAndDownloadUtils {
         }
         return extension;
     }
-    //TODO文件删除的方法
+
+    /**
+     * 获取文件名(从文件路径获取最后一个路径分隔符后面的文件名)
+     *
+     * @param path
+     * @return
+     */
+    public static final String getFileName(String path) {
+        String filePath = path.trim();
+        int index = filePath.lastIndexOf(File.separator);
+        return filePath.substring(index + 1);
+    }
 }

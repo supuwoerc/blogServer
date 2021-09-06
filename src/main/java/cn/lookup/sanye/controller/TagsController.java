@@ -52,7 +52,7 @@ public class TagsController {
     public Result saveTags(@Validated @RequestBody Tags[] tags) {
         SysUserDetails sysUserDetails = (SysUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         List<Tags> list = tagsService.list(new QueryWrapper<Tags>().eq("create_user", sysUserDetails.getId()));
-        if (list.size() >= 15) {
+        if (list.size() > 15) {
             throw new BadRequestException(500, "标签数量大于15");
         } else {
             for (int i = 0; i < tags.length; i++) {

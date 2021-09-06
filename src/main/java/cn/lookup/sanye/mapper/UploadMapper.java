@@ -12,5 +12,14 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @since 2021-08-05
  */
 public interface UploadMapper extends BaseMapper<Upload> {
-
+    /**
+     * 更新数据库文件上传的记录为失活(文件不会删除，文件的删除依赖定时任务)
+     * @param names upload的文件名集合
+     */
+    void delete(String[] names);
+    /**
+     * 激活文件
+     * @param ids
+     */
+    void active(Long[] ids);
 }

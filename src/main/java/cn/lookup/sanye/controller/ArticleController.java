@@ -57,7 +57,7 @@ public class ArticleController {
     }
 
     /**
-     * 删除封面图片
+     * 失活封面图片
      *
      * @return
      */
@@ -88,8 +88,8 @@ public class ArticleController {
             article.setCreate_time(LocalDateTime.now());
             article.setCreate_user(sysUserDetails.getId());
             //验证封面文件是否存在
-            if(!FileUploadAndDownloadUtils.fileExists(article.getCover_url())){
-                throw new BadRequestException(500,"封面图片已过期");
+            if (!FileUploadAndDownloadUtils.fileExists(article.getCover_url())) {
+                throw new BadRequestException(500, "封面图片已过期");
             }
             //激活封面
             uploadService.activeByFileNames(new String[]{article.getCover_url()});
@@ -100,6 +100,11 @@ public class ArticleController {
             if (one == null) {
                 throw new BadRequestException(500, "未找到用户的该文章");
             }
+            //判断更新封面,需要将旧封面失活
+            if (one.getCover_url() != null && !("".equals(one.getCover_url())) && !article.getCover_url().equals(one.getCover_url())) {
+                uploadService.deleteByFileNames(new String[]{one.getCover_url()});
+            }
+            uploadService.deleteByFileNames(new String[]{article.getCover_url()});
             articleService.updateById(article);
         }
         return Result.success("保存成功");

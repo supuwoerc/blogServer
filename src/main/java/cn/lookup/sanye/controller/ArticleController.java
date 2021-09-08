@@ -104,7 +104,10 @@ public class ArticleController {
             if (one.getCover_url() != null && !("".equals(one.getCover_url())) && !article.getCover_url().equals(one.getCover_url())) {
                 uploadService.deleteByFileNames(new String[]{one.getCover_url()});
             }
-            uploadService.deleteByFileNames(new String[]{article.getCover_url()});
+            //激活新封面
+            if (article.getCover_url() != null && !("".equals(article.getCover_url())) && !article.getCover_url().equals(one.getCover_url())) {
+                uploadService.activeByFileNames(new String[]{article.getCover_url()});
+            }
             articleService.updateById(article);
         }
         return Result.success("保存成功");

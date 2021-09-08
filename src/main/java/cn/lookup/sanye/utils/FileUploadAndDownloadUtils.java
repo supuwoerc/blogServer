@@ -273,4 +273,16 @@ public class FileUploadAndDownloadUtils {
         int index = filePath.lastIndexOf(File.separator);
         return filePath.substring(index + 1);
     }
+
+    /**
+     * 判断上传的文件在磁盘上是否存在
+     *
+     * @param path
+     * @return
+     */
+    public static final boolean fileExists(String path) {
+        String filePath = path.trim();
+        filePath.replaceAll("/upload-images/", FILE_DEFAULT_DIR);
+        return new File(filePath).isFile();
+    }
 }

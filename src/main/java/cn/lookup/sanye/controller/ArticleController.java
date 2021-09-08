@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -86,6 +87,13 @@ public class ArticleController {
         if (article.getId() == null) {
             article.setCreate_time(LocalDateTime.now());
             article.setCreate_user(sysUserDetails.getId());
+            //验证封面文件是否存在
+            if(!FileUploadAndDownloadUtils.fileExists(article.getCover_url())){
+                throw new BadRequestException(500,"封面图片已过期");
+            }
+            //激活封面
+            uploadService.activeByFileNames(new String[]{article.getCover_url()});
+            //保存文章
             articleService.save(article);
         } else {
             Article one = articleService.getOne(new QueryWrapper<Article>().eq("id", article.getId()).eq("create_user", sysUserDetails.getId()));
@@ -113,7 +121,7 @@ public class ArticleController {
         }
         String[] arr = new String[covers.size()];
         String[] names = covers.toArray(arr);
-        uploadService.delete(names); //失活文章关联的封面图片
+        uploadService.deleteByFileNames(names); //失活文章关联的封面图片
         articleService.removeByIds(Arrays.asList(ids)); //删除文章
         return Result.success("删除成功");
     }

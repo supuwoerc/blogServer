@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -50,24 +51,25 @@ public class ArticleController {
     public Result uploadCoverImg(@RequestParam("file") MultipartFile file) throws Exception {
         SysUserDetails sysUserDetails = (SysUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         final MultipartFile[] multipartFiles = new MultipartFile[]{file};
-        final List<UploadFile> result = uploadService.upload(sysUserDetails.getId(), multipartFiles, null, MimeTypeEnum.IMAGE_EXTENSION.getTypes(), "文章封面");
+        final List<UploadFile> result = uploadService.upload(sysUserDetails.getId(), multipartFiles, null, MimeTypeEnum.IMAGE_EXTENSION.getTypes(), "文章封面", 0);
         return Result.success(result.get(0));
     }
 
     /**
      * 删除封面图片
      *
-     * @param id
      * @return
      */
     @DeleteMapping("/delete/cover")
-    public Result deleteCoverImg(@RequestParam("id") Long id) {
+    public Result deleteCoverImg(@RequestBody Map<String, Long> map) {
         SysUserDetails sysUserDetails = (SysUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Upload one = uploadService.getOne(new QueryWrapper<Upload>().eq("id", id).eq("uid", sysUserDetails.getId()));
+        Upload one = uploadService.getOne(new QueryWrapper<Upload>().eq("id", map.get("id")).eq("uid", sysUserDetails.getId()));
         if (one == null) {
             throw new BadRequestException(500, "用户未上传该文件");
         }
-        uploadService.delete(new Long[]{one.getId()});
+        if (one.getActive() == 1) {
+            uploadService.delete(new Long[]{one.getId()});
+        }
         return Result.success("删除成功");
     }
 
@@ -97,6 +99,7 @@ public class ArticleController {
 
     /**
      * 删除文章
+     *
      * @param ids
      * @return
      */

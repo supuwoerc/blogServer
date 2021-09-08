@@ -34,7 +34,7 @@ public class UploadServiceImpl extends ServiceImpl<UploadMapper, Upload> impleme
      * @throws Exception
      */
     @Override
-    public List<UploadFile> upload(Long uid, MultipartFile[] files, String dir, String[] allowedExtension, String name) throws Exception {
+    public List<UploadFile> upload(Long uid, MultipartFile[] files, String dir, String[] allowedExtension, String name, int active) throws Exception {
         for (MultipartFile file : files) {
             if (file == null || file.getOriginalFilename() == null || "".equals(file.getOriginalFilename())) {
                 throw new Exception("上传文件为空");
@@ -56,6 +56,7 @@ public class UploadServiceImpl extends ServiceImpl<UploadMapper, Upload> impleme
             uploadFile.setCreate_time(LocalDateTime.now());
             uploadFile.setUpdate_time(LocalDateTime.now());
             uploadFile.setSize(files[i].getSize());
+            uploadFile.setActive(active);
             batch.add(uploadFile);
         }
         this.saveBatch(batch); //批量添加数据库记录
@@ -90,17 +91,27 @@ public class UploadServiceImpl extends ServiceImpl<UploadMapper, Upload> impleme
      * @param names upload的文件名集合
      */
     @Override
-    public void delete(String[] names) {
-        this.delete(names);
+    public void deleteByFileNames(String[] names) {
+        this.deleteByFileNames(names);
     }
 
     /**
-     * 激活文件
+     * 激活文件,根据id集合
      *
      * @param ids
      */
     @Override
     public void active(Long[] ids) {
         this.active(ids);
+    }
+
+    /**
+     * 激活文件，根据文件名集合
+     *
+     * @param names
+     */
+    @Override
+    public void activeByFileNames(String[] names) {
+        this.activeByFileNames(names);
     }
 }

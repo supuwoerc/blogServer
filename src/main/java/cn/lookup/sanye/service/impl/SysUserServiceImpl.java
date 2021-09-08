@@ -216,19 +216,14 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, User> impleme
      */
     @Override
     public UploadFile updateAvatar(MultipartFile file, Long uid) throws Exception {
-        Upload oldAvatar = uploadService.getOne(new QueryWrapper<Upload>().eq("uid", uid).eq("active",1).eq("description", "用户头像"));
+        Upload oldAvatar = uploadService.getOne(new QueryWrapper<Upload>().eq("uid", uid).eq("active", 1).eq("description", "用户头像"));
         if (oldAvatar != null) {
             //将旧头像失活
             uploadService.delete(new Long[]{oldAvatar.getId()});
-            log.info("将用户---{}---的旧头像失活,交由定时任务处理头像文件",uid);
+            log.info("将用户---{}---的旧头像失活,交由定时任务处理头像文件", uid);
         }
-        //上传头像
-        List<UploadFile> result = uploadService.upload(uid, new MultipartFile[]{file}, null, MimeTypeEnum.IMAGE_EXTENSION.getTypes(), "用户头像");
-        Upload upload = new Upload();
-        BeanUtils.copyProperties(result.get(0),upload);
-        upload.setActive(1);
-        //激活头像文件
-        uploadService.updateById(upload);
+        //上传并且激活头像(active=1)
+        List<UploadFile> result = uploadService.upload(uid, new MultipartFile[]{file}, null, MimeTypeEnum.IMAGE_EXTENSION.getTypes(), "用户头像", 1);
         return result.get(0);
     }
 }

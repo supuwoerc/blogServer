@@ -52,6 +52,10 @@ public class Upload implements Serializable {
      * 文件名
      */
     private String old_name;
+    /**
+     * 文件在磁盘上的名子
+     */
+    private String file_name;
 
     /**
      * 描述

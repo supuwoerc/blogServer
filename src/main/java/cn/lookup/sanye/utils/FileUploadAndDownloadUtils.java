@@ -270,7 +270,7 @@ public class FileUploadAndDownloadUtils {
      */
     public static final String getFileName(String path) {
         String filePath = path.trim();
-        int index = filePath.lastIndexOf(File.separator);
+        int index = filePath.lastIndexOf("/");
         return filePath.substring(index + 1);
     }
 
@@ -282,7 +282,9 @@ public class FileUploadAndDownloadUtils {
      */
     public static final boolean fileExists(String path) {
         String filePath = path.trim();
-        filePath.replaceAll("/upload-images/", FILE_DEFAULT_DIR);
-        return new File(filePath).isFile();
+        String s = filePath.replaceAll("/upload-images", FILE_DEFAULT_DIR);
+        System.out.println(s);
+        File realFile = new File(s);
+        return realFile.exists()&&realFile.isFile();
     }
 }

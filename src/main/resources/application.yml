@@ -40,7 +40,7 @@ spring:
       max-file-size: 10MB #单个上传文件大小
       max-request-size: 100MB #文件总上传大小
 upload:
-  default-dir: D:\study\upload  #默认上传位置
+  default-dir: D:/study/upload  #默认上传位置
   name-max-length: 100 #文件名最大长度
 #自定义的验证码配置
 captcha:

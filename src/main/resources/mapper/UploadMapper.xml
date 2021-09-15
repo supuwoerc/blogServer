@@ -18,8 +18,8 @@
         id, location, name, old_name, description, create_time, update_time
     </sql>
     <!--根据文件id集合批量更新失活文件-->
-    <update id="delete" parameterType="java.util.List">
-        update sys_upload set active = 0
+    <update id="deleteByIds" parameterType="java.util.List">
+        update sys_upload set active = 0,update_time = NOW()
         <where>
             id in
             <foreach collection="array" item="item" index="index" open="(" separator="," close=")">#{item}</foreach>
@@ -27,15 +27,17 @@
     </update>
     <!--根据文件名集合批量更新失活文件-->
     <update id="deleteByFileNames" parameterType="java.util.List">
-        update sys_upload set active = 0
+        update sys_upload set active = 0,update_time = NOW()
         <where>
-            position (location in <foreach collection="array" item="item" index="index" open="(" separator=","
-                                           close=")">#{item}</foreach>) > 0
+            file_name in
+            <foreach collection="array" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
         </where>
     </update>
     <!--根据文件id集合批量激活文件-->
     <update id="active" parameterType="java.util.List">
-        update sys_upload set active = 1
+        update sys_upload set active = 1,update_time = NOW()
         <where>
             id in
             <foreach collection="array" item="item" index="index" open="(" separator="," close=")">#{item}</foreach>
@@ -43,10 +45,12 @@
     </update>
     <!--根据文件名集合批量更新激活文件-->
     <update id="activeByFileNames" parameterType="java.util.List">
-        update sys_upload set active = 1
+        update sys_upload set active = 1,update_time = NOW()
         <where>
-            position (location in <foreach collection="array" item="item" index="index" open="(" separator=","
-                                           close=")">#{item}</foreach>) > 0
+            file_name in
+            <foreach collection="array" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
         </where>
     </update>
 </mapper>

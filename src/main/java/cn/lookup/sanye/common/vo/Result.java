@@ -3,7 +3,6 @@ package cn.lookup.sanye.common.vo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;

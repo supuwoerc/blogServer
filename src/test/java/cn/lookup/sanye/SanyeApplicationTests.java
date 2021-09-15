@@ -48,7 +48,11 @@ class SanyeApplicationTests {
     }
 
     @Test
+    void deActiveUpload() {
+        uploadService.delete(new Long[]{17L, 18L});
+    }
+    @Test
     void activeUpload() {
-        uploadService.delete(new Long[]{1L, 2L});
+        uploadService.active(new Long[]{17L, 18L});
     }
 }

@@ -57,6 +57,7 @@ public class UploadServiceImpl extends ServiceImpl<UploadMapper, Upload> impleme
             uploadFile.setUpdate_time(LocalDateTime.now());
             uploadFile.setSize(files[i].getSize());
             uploadFile.setActive(active);
+            uploadFile.setFile_name(uploadResult.get(i).getName());
             batch.add(uploadFile);
         }
         this.saveBatch(batch); //批量添加数据库记录
@@ -74,15 +75,7 @@ public class UploadServiceImpl extends ServiceImpl<UploadMapper, Upload> impleme
      */
     @Override
     public void delete(Long[] ids) {
-        ArrayList<Upload> uploads = new ArrayList<>();
-        for (Long id : ids) {
-            Upload item = new Upload();
-            item.setId(id);
-            item.setActive(0);
-            item.setUpdate_time(LocalDateTime.now());
-            uploads.add(item);
-        }
-        this.updateBatchById(uploads);
+        this.baseMapper.deleteByIds(ids);
     }
 
     /**
@@ -92,7 +85,7 @@ public class UploadServiceImpl extends ServiceImpl<UploadMapper, Upload> impleme
      */
     @Override
     public void deleteByFileNames(String[] names) {
-        this.deleteByFileNames(names);
+        this.baseMapper.deleteByFileNames(names);
     }
 
     /**
@@ -102,7 +95,7 @@ public class UploadServiceImpl extends ServiceImpl<UploadMapper, Upload> impleme
      */
     @Override
     public void active(Long[] ids) {
-        this.active(ids);
+        this.baseMapper.active(ids);
     }
 
     /**
@@ -112,6 +105,6 @@ public class UploadServiceImpl extends ServiceImpl<UploadMapper, Upload> impleme
      */
     @Override
     public void activeByFileNames(String[] names) {
-        this.activeByFileNames(names);
+        this.baseMapper.activeByFileNames(names);
     }
 }

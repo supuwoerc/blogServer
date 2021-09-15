@@ -4,19 +4,31 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="cn.lookup.sanye.pojo.Article">
-        <id column="id" property="id" />
-        <result column="title" property="title" />
-        <result column="content" property="content" />
-        <result column="like_num" property="like_num" />
-        <result column="view_num" property="view_num" />
-        <result column="update_time" property="update_time" />
-        <result column="create_time" property="create_time" />
-        <result column="create_user" property="create_user" />
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="like_num" property="like_num"/>
+        <result column="view_num" property="view_num"/>
+        <result column="update_time" property="update_time"/>
+        <result column="create_time" property="create_time"/>
+        <result column="create_user" property="create_user"/>
     </resultMap>
-
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id, title, content, like_num, view_num, update_time, create_time, create_user
     </sql>
-
+    <!-- 删除关联关系 -->
+    <delete id="deleteArticleTags" parameterType="java.util.List">
+        delete from sys_article_tags where articel_id in
+        <foreach collection="article_ids" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>;
+    </delete>
+    <!-- 插入关联关系 -->
+    <insert id="saveArticleTags" parameterType="java.util.Map">
+        insert into sys_article_tags(articel_id,tags_id) values
+        <foreach collection="tagsIds" item="item" separator="," close=";">
+            (#{articel_id},#{item})
+        </foreach>
+    </insert>
 </mapper>

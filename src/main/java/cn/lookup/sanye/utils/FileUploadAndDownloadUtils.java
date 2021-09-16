@@ -283,8 +283,7 @@ public class FileUploadAndDownloadUtils {
     public static final boolean fileExists(String path) {
         String filePath = path.trim();
         String s = filePath.replaceAll("/upload-images", FILE_DEFAULT_DIR);
-        System.out.println(s);
         File realFile = new File(s);
-        return realFile.exists()&&realFile.isFile();
+        return realFile.exists() && realFile.isFile();
     }
 }

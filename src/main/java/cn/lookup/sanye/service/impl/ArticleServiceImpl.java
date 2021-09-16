@@ -1,16 +1,14 @@
 package cn.lookup.sanye.service.impl;
 
 import cn.lookup.sanye.exception.BadRequestException;
-import cn.lookup.sanye.pojo.Article;
+import cn.lookup.sanye.pojo.*;
 import cn.lookup.sanye.mapper.ArticleMapper;
-import cn.lookup.sanye.pojo.SysUserDetails;
-import cn.lookup.sanye.pojo.Tags;
-import cn.lookup.sanye.pojo.Upload;
 import cn.lookup.sanye.service.IArticleService;
-import cn.lookup.sanye.service.IArticleTagsService;
 import cn.lookup.sanye.service.IUploadService;
 import cn.lookup.sanye.utils.FileUploadAndDownloadUtils;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -50,6 +48,8 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         if (article.getId() == null) {
             article.setCreate_time(LocalDateTime.now());
             article.setCreate_user(sysUserDetails.getId());
+            article.setLike_num(0L);
+            article.setView_num(0L);
             //验证封面文件是否存在
             if (article.getCover_url() != null && !"".equals(article.getCover_url()) && !FileUploadAndDownloadUtils.fileExists(article.getCover_url())) {
                 throw new BadRequestException(500, "封面图片已过期,请重新上传");
@@ -139,5 +139,19 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         }
         this.baseMapper.deleteArticleTags(new Long[]{article_id});
         this.baseMapper.saveArticleTags(map);
+    }
+
+    /**
+     * 查询文章列表
+     *
+     * @param articlePage
+     * @param keyWord
+     * @param uid
+     * @return
+     */
+    @Override
+    public IPage<Article> getArticleList(Page<Article> articlePage, String keyWord, Long uid) {
+        IPage<Article> pageList = this.baseMapper.getArticleList(articlePage, keyWord,uid);
+        return pageList;
     }
 }

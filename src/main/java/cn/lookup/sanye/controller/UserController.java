@@ -38,9 +38,6 @@ import java.util.Map;
 public class UserController {
     @Autowired
     private SysUserService sysUserService;
-    @Autowired
-    private IUploadService uploadService;
-
     /**
      * 获取当前登录人信息
      *
@@ -51,7 +48,6 @@ public class UserController {
         //获取当前上下文中的用户
         SysUserDetails sysUserDetails = (SysUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user = sysUserService.getOne(new QueryWrapper<User>().lambda().eq(User::getUsername, sysUserDetails.getUsername()));
-        user.setPassword(null);
         return Result.success(user);
     }
 

@@ -43,7 +43,7 @@
 		</collection>
 	</resultMap>
 	<!--查询用户列表(可以根据角色查找对应列表)-->
-	<select id="getUserList" resultMap="getUserListMap" parameterType="String">
+	<select id="getUserList" resultMap="getUserListMap">
 		SELECT
 		distinct
 		u.id,u.avatar,u.gender,u.nickname,u.status,u.username

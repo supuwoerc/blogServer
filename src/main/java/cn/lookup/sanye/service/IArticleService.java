@@ -1,7 +1,8 @@
 package cn.lookup.sanye.service;
 
 import cn.lookup.sanye.pojo.Article;
-import cn.lookup.sanye.pojo.Tags;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.Map;
@@ -39,4 +40,13 @@ public interface IArticleService extends IService<Article> {
      * @param map
      */
     void saveArticleTags(Map<String,Object> map);
+
+    /**
+     * 查询文章列表
+     * @param articlePage
+     * @param keyWord
+     * @param uid
+     * @return
+     */
+    IPage<Article> getArticleList(Page<Article> articlePage, String keyWord, Long uid);
 }

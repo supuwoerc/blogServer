@@ -19,16 +19,38 @@
     </sql>
     <!-- 删除关联关系 -->
     <delete id="deleteArticleTags" parameterType="java.util.List">
-        delete from sys_article_tags where articel_id in
-        <foreach collection="article_ids" open="(" separator="," close=")" item="item">
+        delete from sys_article_tags where article_id in
+        <foreach collection="array" open="(" separator="," close=")" item="item">
             #{item}
         </foreach>;
     </delete>
     <!-- 插入关联关系 -->
     <insert id="saveArticleTags" parameterType="java.util.Map">
-        insert into sys_article_tags(articel_id,tags_id) values
-        <foreach collection="tagsIds" item="item" separator="," close=";">
-            (#{articel_id},#{item})
+        insert into sys_article_tags(article_id,tags_id) values
+        <foreach collection="tagIds" item="item" separator="," close=";">
+            (#{article_id},#{item})
         </foreach>
     </insert>
+    <resultMap id="articleListMap" type="cn.lookup.sanye.pojo.Article">
+        <id column="id" property="id"/>
+        <collection property="tagsList" ofType="cn.lookup.sanye.pojo.Tags" select="getTagsByArticleId"
+                    column="id"></collection>
+    </resultMap>
+    <!--查询文章列表-->
+    <select id="getArticleList" resultMap="articleListMap">
+        select * from sys_article
+        <where>
+            create_user=#{uid}
+            <if test="keyWord!=null and keyWord!=''">
+                and title like concat("%",#{keyWord},"%")
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+    <!--根据文章id查询关联的标签-->
+    <select id="getTagsByArticleId" resultType="cn.lookup.sanye.pojo.Tags">
+		SELECT t.*
+		FROM sys_tags t,sys_article_tags cen
+		WHERE t.id=cen.tags_id AND cen.article_id = #{article_id}
+	</select>
 </mapper>

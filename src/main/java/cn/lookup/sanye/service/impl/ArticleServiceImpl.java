@@ -146,12 +146,13 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
      *
      * @param articlePage
      * @param keyWord
+     * @param isOverview
      * @param uid
      * @return
      */
     @Override
-    public IPage<Article> getArticleList(Page<Article> articlePage, String keyWord, Long uid) {
-        IPage<Article> pageList = this.baseMapper.getArticleList(articlePage, keyWord,uid);
+    public IPage<Article> getArticleList(Page<Article> articlePage, String keyWord, int isOverview, Long uid) {
+        IPage<Article> pageList = this.baseMapper.getArticleList(articlePage, keyWord,isOverview,uid);
         return pageList;
     }
 }

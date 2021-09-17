@@ -38,7 +38,16 @@
     </resultMap>
     <!--查询文章列表-->
     <select id="getArticleList" resultMap="articleListMap">
-        select * from sys_article
+        select
+        <choose>
+            <when test="isOverview!=null and isOverview==1">
+                id,title,cover_url,like_num,view_num,update_time,create_time,create_user
+            </when>
+            <otherwise>
+                *
+            </otherwise>
+        </choose>
+        from sys_article
         <where>
             create_user=#{uid}
             <if test="keyWord!=null and keyWord!=''">

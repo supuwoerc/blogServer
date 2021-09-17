@@ -114,15 +114,17 @@ public class ArticleController {
      * @param page
      * @param size
      * @param keyWord
+     * @param isOverview
      * @return
      */
     @GetMapping("/list")
     public Result getArticleList(@RequestParam(value = "page", required = false, defaultValue = "1") long page,
                                  @RequestParam(value = "size", required = false, defaultValue = "10") long size,
-                                 @RequestParam(value = "keyWord", required = false, defaultValue = "") String keyWord) {
+                                 @RequestParam(value = "keyWord", required = false, defaultValue = "") String keyWord,
+                                 @RequestParam(value="isOverview",required = false,defaultValue = "0") int isOverview) {
         Page<Article> articlePage = new Page<>(page, size);
         SysUserDetails sysUserDetails = (SysUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        IPage<Article> articleList = articleService.getArticleList(articlePage, keyWord,sysUserDetails.getId());
+        IPage<Article> articleList = articleService.getArticleList(articlePage, keyWord,isOverview,sysUserDetails.getId());
         return Result.success(articleList);
     }
 }

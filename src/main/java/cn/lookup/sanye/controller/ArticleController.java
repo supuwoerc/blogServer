@@ -3,12 +3,14 @@ package cn.lookup.sanye.controller;
 
 import cn.lookup.sanye.common.vo.Result;
 import cn.lookup.sanye.common.vo.UploadFile;
+import cn.lookup.sanye.exception.BadRequestException;
 import cn.lookup.sanye.pojo.Article;
 import cn.lookup.sanye.pojo.SysUserDetails;
 import cn.lookup.sanye.pojo.User;
 import cn.lookup.sanye.service.IArticleService;
 import cn.lookup.sanye.service.IUploadService;
 import cn.lookup.sanye.utils.MimeTypeEnum;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -126,5 +128,14 @@ public class ArticleController {
         SysUserDetails sysUserDetails = (SysUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         IPage<Article> articleList = articleService.getArticleList(articlePage, keyWord,isOverview,sysUserDetails.getId());
         return Result.success(articleList);
+    }
+    @GetMapping("/detail/{id}")
+    public Result getArticleDetail(@PathVariable(name = "id") Long id){
+        //TODO 查询用户点赞文章的情况
+        Article one = articleService.getOne(new QueryWrapper<Article>().eq("id",id));
+        if(one==null){
+            throw new BadRequestException(500,"未找到改文章");
+        }
+        return Result.success(one);
     }
 }

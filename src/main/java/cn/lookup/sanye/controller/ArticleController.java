@@ -132,10 +132,20 @@ public class ArticleController {
     @GetMapping("/detail/{id}")
     public Result getArticleDetail(@PathVariable(name = "id") Long id){
         //TODO 查询用户点赞文章的情况
-        Article one = articleService.getOne(new QueryWrapper<Article>().eq("id",id));
+        Article one = articleService.getArticleDetailById(id);
         if(one==null){
-            throw new BadRequestException(500,"未找到改文章");
+            throw new BadRequestException(500,"未找到文章");
         }
         return Result.success(one);
+    }
+
+    /**
+     * 点赞文章、取消点赞文章(存到redis让定时任务同步数据)
+     * @param map
+     * @return
+     */
+    @PostMapping("/likeOrUnlike")
+    public Result makeLikeStatus(@RequestBody Map<String,Long> map){
+        return Result.success(null);
     }
 }

@@ -36,25 +36,31 @@
         <collection property="tagsList" ofType="cn.lookup.sanye.pojo.Tags" select="getTagsByArticleId"
                     column="id"></collection>
     </resultMap>
+    <resultMap id="articleDetailMap" type="cn.lookup.sanye.pojo.Article">
+        <id column="id" property="id"/>
+        <collection property="tagsList" ofType="cn.lookup.sanye.pojo.Tags" select="getTagsByArticleId"
+                    column="id"></collection>
+    </resultMap>
     <!--查询文章列表-->
     <select id="getArticleList" resultMap="articleListMap">
         select
         <choose>
             <when test="isOverview!=null and isOverview==1">
-                id,title,cover_url,like_num,view_num,update_time,create_time,create_user
+                a.id,a.title,a.cover_url,a.like_num,a.view_num,a.update_time,a.create_time,
+                a.create_user,b.nickname create_username
             </when>
             <otherwise>
-                *
+                a.*,b.nickname create_username
             </otherwise>
         </choose>
-        from sys_article
+        from sys_article a left join sys_user b on a.create_user = b.id
         <where>
-            create_user=#{uid}
+            a.create_user=#{uid}
             <if test="keyWord!=null and keyWord!=''">
-                and title like concat("%",#{keyWord},"%")
+                and a.title like concat("%",#{keyWord},"%")
             </if>
         </where>
-        order by create_time desc
+        order by a.create_time desc
     </select>
     <!--根据文章id查询关联的标签-->
     <select id="getTagsByArticleId" resultType="cn.lookup.sanye.pojo.Tags">
@@ -62,4 +68,12 @@
 		FROM sys_tags t,sys_article_tags cen
 		WHERE t.id=cen.tags_id AND cen.article_id = #{article_id}
 	</select>
+    <select id="getArticleDetailById" resultMap="articleDetailMap">
+        select
+        a.*,b.nickname create_username
+        from sys_article a left join sys_user b on a.create_user = b.id
+        <where>
+            a.id = #{id}
+        </where>
+    </select>
 </mapper>

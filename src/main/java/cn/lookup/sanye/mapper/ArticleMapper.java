@@ -38,4 +38,12 @@ public interface ArticleMapper extends BaseMapper<Article> {
      * @return
      */
     IPage<Article> getArticleList(Page<Article> articlePage, String keyWord, int isOverview, Long uid);
+
+    /**
+     * 根据文章ID查询文章信息的方法
+     * @param id
+     * @return
+     */
+    Article getArticleDetailById(Long id);
+
 }

@@ -82,6 +82,11 @@ public class Article implements Serializable {
      */
     private Long create_user;
     /**
+     * 创建者名称
+     */
+    @TableField(exist = false)
+    private String create_username;
+    /**
      * 标签列表
      */
     @TableField(exist = false)

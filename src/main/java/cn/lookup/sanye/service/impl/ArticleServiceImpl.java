@@ -155,4 +155,14 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         IPage<Article> pageList = this.baseMapper.getArticleList(articlePage, keyWord,isOverview,uid);
         return pageList;
     }
+
+    /**
+     * 根据文章ID查询文章信息的接口
+     * @param id
+     * @return
+     */
+    @Override
+    public Article getArticleDetailById(Long id) {
+        return this.baseMapper.getArticleDetailById(id);
+    }
 }

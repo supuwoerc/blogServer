@@ -57,4 +57,12 @@ public interface IArticleService extends IService<Article> {
      * @return
      */
     Article getArticleDetailById(Long id);
+
+    /**
+     * 点赞、取消点赞
+     * @param articleId
+     * @param like
+     * @return
+     */
+    boolean makeLikeStatus(Long articleId, Long like);
 }

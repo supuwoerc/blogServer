@@ -76,4 +76,4 @@ jwt:
   # 刷新时间，单位天
   refreshTime: 14
   # 配置白名单（不需要认证）
-  antMatchers: /,/login/**,/register/**,/static/**,/index.html,/swagger-resources/**,/webjars/**,/v2/api-docs,/doc.html,/captcha,/menu/defaultMenu,/user/activeUser/**/**,/user/reActiveUser/**,/upload-images/**
+  antMatchers: /,/login/**,/register/**,/static/**,/index.html,/swagger-resources/**,/webjars/**,/v2/api-docs,/doc.html,/captcha,/menu/defaultMenu,/user/activeUser/**/**,/user/reActiveUser/**,/upload-images/**,/article/detail/**,/article/detail/**

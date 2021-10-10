@@ -34,10 +34,11 @@ public interface ArticleMapper extends BaseMapper<Article> {
      * @param articlePage
      * @param keyWord
      * @param isOverview
+     * @param vuid   //查询者的id
      * @param uid
      * @return
      */
-    IPage<Article> getArticleList(Page<Article> articlePage, String keyWord, int isOverview, Long uid);
+    IPage<Article> getArticleList(Page<Article> articlePage, String keyWord, int isOverview, Long uid, Long vuid);
 
     /**
      * 根据文章ID查询文章信息的方法
@@ -45,5 +46,12 @@ public interface ArticleMapper extends BaseMapper<Article> {
      * @return
      */
     Article getArticleDetailById(Long id);
+
+    /**
+     * 查询用户对文章的点赞状态
+     * @param map
+     * @return
+     */
+    boolean getLikeStatus(Map<String,Object> map);
 
 }

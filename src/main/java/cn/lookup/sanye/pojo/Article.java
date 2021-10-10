@@ -91,4 +91,9 @@ public class Article implements Serializable {
      */
     @TableField(exist = false)
     private List<Tags> tagsList;
+    /**
+     * 被当前用户点赞过没
+     */
+    @TableField(exist = false)
+    private boolean hasLiked;
 }

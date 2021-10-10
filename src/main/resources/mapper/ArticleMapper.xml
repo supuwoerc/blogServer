@@ -33,6 +33,7 @@
     </insert>
     <resultMap id="articleListMap" type="cn.lookup.sanye.pojo.Article">
         <id column="id" property="id"/>
+        <result property="hasLiked" javaType="boolean" column="hasLiked"></result>
         <collection property="tagsList" ofType="cn.lookup.sanye.pojo.Tags" select="getTagsByArticleId"
                     column="id"></collection>
     </resultMap>
@@ -47,13 +48,14 @@
         <choose>
             <when test="isOverview!=null and isOverview==1">
                 a.id,a.title,a.cover_url,a.like_num,a.view_num,a.update_time,a.create_time,
-                a.create_user,b.nickname create_username
+                a.create_user,b.nickname create_username,IFNULL(c.user_id,0) hasLiked
             </when>
             <otherwise>
                 a.*,b.nickname create_username
             </otherwise>
         </choose>
         from sys_article a left join sys_user b on a.create_user = b.id
+        left join sys_user_like c on a.id = c.like_id and c.user_id = #{vuid}
         <where>
             a.create_user=#{uid}
             <if test="keyWord!=null and keyWord!=''">
@@ -75,5 +77,8 @@
         <where>
             a.id = #{id}
         </where>
+    </select>
+    <select id="getLikeStatus" resultType="boolean" parameterType="java.util.Map">
+        select count(*) from sys_user_like where user_id = #{vuid} and like_id=#{article_id}
     </select>
 </mapper>

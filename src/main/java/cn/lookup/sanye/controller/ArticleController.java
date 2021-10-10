@@ -131,7 +131,6 @@ public class ArticleController {
     }
     @GetMapping("/detail/{id}")
     public Result getArticleDetail(@PathVariable(name = "id") Long id){
-        //TODO 查询用户点赞文章的情况
         Article one = articleService.getArticleDetailById(id);
         if(one==null){
             throw new BadRequestException(500,"未找到文章");
@@ -146,6 +145,9 @@ public class ArticleController {
      */
     @PostMapping("/likeOrUnlike")
     public Result makeLikeStatus(@RequestBody Map<String,Long> map){
-        return Result.success(null);
+        Long like = Long.valueOf(map.get("like").toString());
+        Long articleId = Long.valueOf(map.get("articleId").toString());
+        boolean s = articleService.makeLikeStatus(articleId,like);
+        return Result.success(s);
     }
 }

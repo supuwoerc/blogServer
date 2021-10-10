@@ -6,10 +6,12 @@ import cn.lookup.sanye.mapper.ArticleMapper;
 import cn.lookup.sanye.service.IArticleService;
 import cn.lookup.sanye.service.IUploadService;
 import cn.lookup.sanye.utils.FileUploadAndDownloadUtils;
+import cn.lookup.sanye.utils.RedisUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -30,9 +32,12 @@ import java.util.Map;
  * @since 2021-08-10
  */
 @Service
+@Slf4j
 public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> implements IArticleService {
     @Autowired
     private IUploadService uploadService;
+    @Autowired
+    private RedisUtil redisUtil;
 
     /**
      * 保存文章
@@ -152,17 +157,80 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
      */
     @Override
     public IPage<Article> getArticleList(Page<Article> articlePage, String keyWord, int isOverview, Long uid) {
-        IPage<Article> pageList = this.baseMapper.getArticleList(articlePage, keyWord,isOverview,uid);
+        SysUserDetails sysUserDetails = (SysUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        final Long viewerUserId = sysUserDetails.getId();  //查询者的ID(判断点赞情况)
+        IPage<Article> pageList = this.baseMapper.getArticleList(articlePage, keyWord, isOverview, uid, viewerUserId);
+        for (Article record : pageList.getRecords()) {
+            //将文章的点赞浏览情况缓存到redis
+            initArticleInfo2Redis(record);
+        }
         return pageList;
     }
 
     /**
      * 根据文章ID查询文章信息的接口
+     *
      * @param id
      * @return
      */
     @Override
     public Article getArticleDetailById(Long id) {
-        return this.baseMapper.getArticleDetailById(id);
+        SysUserDetails principal = null;
+        Article article = this.baseMapper.getArticleDetailById(id);
+        try {
+            principal = (SysUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            HashMap<String, Object> params = new HashMap<>();
+            params.put("vuid", principal.getId());
+            params.put("article_id", id);
+            boolean likeStatus = this.baseMapper.getLikeStatus(params);
+            article.setHasLiked(likeStatus);
+        } catch (Exception e) {
+            article.setHasLiked(false);
+            log.info("未登录用户访问文章,设置文章点赞状态为false");
+        } finally {
+            if (article != null) {
+                //如果是直接复制链接查看，需要初始化状态，不然点赞时获取点赞数量会出现空指针
+                initArticleInfo2Redis(article);
+                //浏览数量+1
+                Object articles_view_status = redisUtil.hget("articles_view_status", article.getId().toString());
+                Long oldNum = Long.valueOf(articles_view_status.toString());
+                redisUtil.hset("articles_view_status", article.getId().toString(), oldNum + 1);
+            }
+        }
+        return article;
+    }
+
+    /**
+     * 点赞、取消点赞
+     *
+     * @param articleId
+     * @param like      1点赞 -1取消点赞
+     * @return
+     */
+    @Override
+    public boolean makeLikeStatus(Long articleId, Long like) {
+        SysUserDetails sysUserDetails = (SysUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        final Long viewerId = sysUserDetails.getId();
+        redisUtil.hset("article_like_list", viewerId + ":::" + articleId, like);
+        Object articles_like_status = redisUtil.hget("articles_like_status", articleId.toString());
+        Long oldNum = Long.valueOf(articles_like_status.toString());
+        redisUtil.hset("articles_like_status", articleId.toString(), oldNum + like);
+        return true;
+    }
+
+    /**
+     * 初始化文章状态到redis
+     *
+     * @param article
+     */
+    private void initArticleInfo2Redis(Article article) {
+        if (!redisUtil.hasKey("articles_like_status") || !redisUtil.hHasKey("articles_like_status", article.getId().toString())) {
+            redisUtil.hset("articles_like_status", article.getId().toString(), article.getLike_num());
+            log.info("初始化文章点赞状态");
+        }
+        if (!redisUtil.hasKey("articles_view_status") || !redisUtil.hHasKey("articles_view_status", article.getId().toString())) {
+            redisUtil.hset("articles_view_status", article.getId().toString(), article.getView_num());
+            log.info("初始化文章浏览状态");
+        }
     }
 }
